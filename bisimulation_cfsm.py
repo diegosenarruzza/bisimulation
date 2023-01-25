@@ -15,9 +15,9 @@ def bisimulation(M1, M2):
   # si puedo prunear "all_posible_knowledge" esto se vuelve mas factible
 
   current_approximation = []
-  next_approximation = E.product(all_posible_knwoledge).product(F)
+  next_approximation = M1.states.product(all_posible_knwoledge).product(M2.states)
 
-  while current_approximation != next_approximation
+  while current_approximation != next_approximation:
     current_approximation = next_approximation
     next_approximation = []
 
