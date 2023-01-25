@@ -25,12 +25,11 @@ class State:
         cleaned_knowledge = self.clean_knowledge_for(knowledge, label)
         simulation_transitions = simulation_state.get_transitions_with(label)
 
-        # Necesito verificar si existe algun subconjunto de transiciones desde "simulation_state", que me sirva para simular la transicion de "state"
-        # Si existe, va a ser unico, ya que si existe mas de un subconjunto que hace esto, quiere decir que existen al menos dos transiciones desde "state"
+        # Necesito verificar si existe algun subconjunto de transiciones desde "simulation_state", que me sirva para simular la transicion de "self"
+        # Si existe, va a ser unico, ya que si existe mas de un subconjunto que hace esto, quiere decir que existen al menos dos transiciones desde "self"
         # tq. ambos caminos son validos para una traza valida. Esto nos daria un automata no-determinista, y estamos trabajando siempre con deterministas.
 
         is_able = transition.exists_a_valid_transition_subset_wich_simulate(simulation_transitions, cleaned_knowledge, approximation)
-        # is_able es False si  el "simulation_state" no puede imitar la transicion "transition"
 
         i += 1
 

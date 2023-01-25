@@ -1,7 +1,8 @@
-from state import State
-from transition import Transition
+from models.state import State
+from models.transition import Transition
+from models.tools import powerset
+
 from itertools import product
-from tools import powerset
 
 class AFSM:
 
@@ -14,7 +15,7 @@ class AFSM:
     self.states[id] = State.new(self, id)
     self.transitions_by_source_id[id] = []
 
-  # TODO: Voy a necesitar que las assertions sean algo mas, cosa de poder acceder a ellas como "logica" y como string.
+  # assertion must to be a z3 assertion
   def add_transition_between(self, source_id, target_id, label, assertion):
     # validate present
     # validate transition not exist
@@ -40,6 +41,8 @@ class AFSM:
     return self.states.values()
 
   # Hay que tener cuidado con el hecho de que los automatas tienen que tener distintos ids
+  # Depende de como definamos la igualdad de State.
+  # Se esta asumiendo que tanto "self", como "afsm" son validos, i.e. que cumplen con lo que cumple un cfsm que son los que estamos usando de base.
   def try_bisimulation_with(self, afsm):
     assertions = list(set(self.all_assertions + afsm.all_assertions))
 
@@ -47,6 +50,7 @@ class AFSM:
 
     current_approximation = []
     symmetric_current_approximation = []
+    # TODO: Hacer notar que nunca va a haber un problema con el orden en el que se genera el conocimiento.
     next_approximation = product([self.get_states(), all_posible_knowledge, afsm.get_states()])
 
     while current_approximation != next_approximation:
