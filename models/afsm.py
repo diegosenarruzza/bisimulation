@@ -12,7 +12,7 @@ class AFSM:
 
   def add_state(self, id):
     # validate not p resent
-    self.states[id] = State.new(self, id)
+    self.states[id] = State(self, id)
     self.transitions_by_source_id[id] = []
 
   # assertion must to be a z3 assertion
@@ -23,7 +23,7 @@ class AFSM:
     source = self.states[source_id]
     target = self.states[target_id]
 
-    transition = Transition.new(source, target, label, assertion) 
+    transition = Transition(source, target, label, assertion) 
 
     self.transitions_by_source_id[source_id].append(transition)
   

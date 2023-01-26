@@ -1,3 +1,5 @@
+from models.tools import collect_variables
+
 class State:
 
   def __init__(self, graph, id):
@@ -10,7 +12,6 @@ class State:
   def get_transitions_with(self, label):
     self.graph.transitions_with_label_of(self.id, self.label)
 
-
   def is_able_to_simulate_falling_into(self, simulation_state, knowledge, approximation):
       is_able = True
       transitions = self.get_transitions()
@@ -20,9 +21,10 @@ class State:
        # Si corta porque i < len(transitions) entonces recorrio todas las acciones y "simulation_state" siempre pudo simular a e y caer dentro de la relacion
       while is_able and i < len(transitions):
         transition = transitions[i]
-        label = transition.label()
+        label = transition.label
 
-        cleaned_knowledge = self.clean_knowledge_for(knowledge, label)
+        # Saco las assertions cuyas variables van a ser sobreescritas por la transicion actual
+        cleaned_knowledge = self._clean_knowledge_for(knowledge, label)
         simulation_transitions = simulation_state.get_transitions_with(label)
 
         # Necesito verificar si existe algun subconjunto de transiciones desde "simulation_state", que me sirva para simular la transicion de "self"
@@ -35,12 +37,6 @@ class State:
 
       return is_able
 
-
-  # TODO: Necesito parsear el label y quedarme con la variable
-  # Quizas, el label tiene que ser algo mas que un string
-  #   es decir, que su version serializada sea un string, pero que cuando se parsee se convierta en un label acorde al lenguaje de los automatas.
-  #   Por lo menos, tiene que saber contestar al mensaje "variable"
-  def clean_knowledge_for(self, label):
-    pass
-
-  # TODO: este metodo no deberia estar aca. De ultima armar una collection custom para almacenar el conocimiento, y que tenga un metodo "clean" o algo asi.
+  # Devuelve un conjunto con las assertions cuyas variables no son las del "label".
+  def _clean_knowledge_for(self, knowledge, label):
+    return set([assertion for assertion in knowledge if label.variable() not in collect_variables(assertion)])
