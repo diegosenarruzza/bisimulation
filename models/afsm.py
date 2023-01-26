@@ -1,8 +1,11 @@
 from models.state import State
 from models.transition import Transition
 from libs.tools import powerset
+from z3 import BoolVal
 
 from itertools import product
+
+TrueAssertion = BoolVal(True)
 
 
 class AFSM:
@@ -12,12 +15,16 @@ class AFSM:
         self.transitions_by_source_id = {}
 
     def add_state(self, id):
-        # validate not p resent
+        # validate not present
         self.states[id] = State(self, id)
         self.transitions_by_source_id[id] = []
 
+    def add_states(self, *ids):
+        for id in ids:
+            self.add_state(id)
+
     # assertion must to be a z3 assertion
-    def add_transition_between(self, source_id, target_id, label, assertion):
+    def add_transition_between(self, source_id, target_id, label, assertion=TrueAssertion):
         # validate present
         # validate transition not exist
 
@@ -33,26 +40,30 @@ class AFSM:
         return self.transitions_by_source_id[id]
 
     def transitions_with_label_of(self, id, label):
-        return filter(lambda transition: transition.label == label, self.transitions_of(id))
+        return set(filter(lambda transition: transition.label == label, self.transitions_of(id)))
 
     def all_assertions(self):
-        return map(lambda transition: transition.assertion, self.transitions_by_source_id.values())
+        return set(
+            map(
+                lambda transition: transition.assertion,
+                [transition for transitions in list(self.transitions_by_source_id.values()) for transition in transitions]
+            )
+        )
 
     def get_states(self):
-        return self.states.values()
+        return set(self.states.values())
 
     # Hay que tener cuidado con el hecho de que los automatas tienen que tener distintos ids
     # Depende de como definamos la igualdad de State.
     # Se esta asumiendo que tanto "self", como "afsm" son validos, i.e. que cumplen con lo que cumple un cfsm que son los que estamos usando de base.
     def try_bisimulation_with(self, afsm):
-        assertions = list(set(self.all_assertions + afsm.all_assertions()))
-
-        all_posible_knowledge = powerset(assertions)
+        assertions = self.all_assertions().union(afsm.all_assertions())
+        all_posible_knowledge = set(powerset(assertions))
 
         current_approximation = []
         symmetric_current_approximation = []
         # TODO: Hacer notar que nunca va a haber un problema con el orden en el que se genera el conocimiento.
-        next_approximation = product([self.get_states(), all_posible_knowledge, afsm.get_states()])
+        next_approximation = list(product(self.get_states(), all_posible_knowledge, afsm.get_states()))
 
         while current_approximation != next_approximation:
             current_approximation = next_approximation
@@ -66,4 +77,4 @@ class AFSM:
                 if e.is_able_to_simulate_falling_into(f, knowledge, current_approximation) and f.is_able_to_simulate_falling_into(e, knowledge, symmetric_current_approximation):
                     next_approximation.append((e, K, f))
 
-        return current_approximation + symmetric_current_approximation
+        return current_approximation #+ symmetric_current_approximation

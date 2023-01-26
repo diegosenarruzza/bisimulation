@@ -21,4 +21,4 @@ def collect_variables(assertion):
 
 # Devuelve un conjunto con las assertions cuyas variables no son las del "label".
 def clean_knowledge_for(knowledge, label):
-    return set([assertion for assertion in knowledge if label.variable() not in collect_variables(assertion)])
+    return set([assertion for assertion in knowledge if label.variable not in collect_variables(assertion)])

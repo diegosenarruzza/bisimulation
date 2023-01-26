@@ -7,6 +7,9 @@ class State:
         self.graph = graph
         self.id = id
 
+    def __repr__(self):
+        return self.id
+
     def get_transitions(self):
         return self.graph.transitions_of(self.id)
 
@@ -25,15 +28,14 @@ class State:
             label = transition.label
 
             # Saco las assertions cuyas variables van a ser sobreescritas por la transicion actual
-            cleaned_knowledge = clean_knowledge_for(knowledge, label)
+            cleaned_knowledge = clean_knowledge_for(knowledge, label) if label.has_variable() else knowledge
             simulation_transitions = simulation_state.get_transitions_with(label)
 
             # Necesito verificar si existe algun subconjunto de transiciones desde "simulation_state", que me sirva para simular la transicion de "self"
             # Si existe, va a ser unico, ya que si existe mas de un subconjunto que hace esto, quiere decir que existen al menos dos transiciones desde "self"
             # tq. ambos caminos son validos para una traza valida. Esto nos daria un automata no-determinista, y estamos trabajando siempre con deterministas.
 
-            is_able = transition.exists_a_valid_transition_subset_wich_simulate(simulation_transitions,
-                                                                                cleaned_knowledge, approximation)
+            is_able = transition.exists_a_valid_transition_subset_wich_simulate(simulation_transitions, cleaned_knowledge, approximation)
 
             i += 1
 
