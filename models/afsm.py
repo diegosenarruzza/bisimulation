@@ -76,7 +76,7 @@ class AFSM:
             if not self._is_a_bisimulation(afsm, smallest_relation):
                 relation.append(removed_element)
 
-        return set(relation)
+        return set(relation).union(set(symetric_relation_of(relation)))
 
     def _build_stratified_bisimulation_from(self, initial_relation):
         current_relation = []

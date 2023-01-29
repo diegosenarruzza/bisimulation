@@ -1,5 +1,6 @@
 import unittest
 from z3 import Int
+from libs.tools import symetric_relation_of
 from specs.resources.afsm_example_1_1 import afsm_example_1_1
 from specs.resources.afsm_example_1_2 import afsm_example_1_2
 from specs.resources.afsm_example_2_1 import afsm_example_2_1
@@ -19,7 +20,7 @@ class AFSMCase(unittest.TestCase):
             (p0, frozenset({Int('x') > 0, Int('y') > Int('x')}), p0)
         }
         relation = afsm_example_2_1.build_bisimulation_with(afsm_example_2_1)
-        self.assertEqual(expected_relation, relation)
+        self._assert_relations_are_equals(expected_relation, relation)
 
     def test_must_be_bisimilars_example_3(self):
         p0 = afsm_example_3_1.states['p0']
@@ -35,7 +36,13 @@ class AFSMCase(unittest.TestCase):
             (p1, frozenset({x != 0, x < 0}), q1)
         }
         relation = afsm_example_3_1.build_bisimulation_with(afsm_example_3_2)
-        self.assertEqual(expected_relation, relation)
+        self._assert_relations_are_equals(expected_relation, relation)
+
+    def _assert_relations_are_equals(self, expected_half_relation, relation):
+        self.assertEqual(
+            expected_half_relation.union(symetric_relation_of(expected_half_relation)),
+            relation
+        )
 
 
 if __name__ == '__main__':
