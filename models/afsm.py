@@ -13,6 +13,7 @@ class AFSM:
     def __init__(self):
         self.states = {}
         self.transitions_by_source_id = {}
+        self.initial_state = None
 
     def add_state(self, id):
         # validate not present
@@ -22,6 +23,10 @@ class AFSM:
     def add_states(self, *ids):
         for id in ids:
             self.add_state(id)
+
+    def set_as_initial(self, id):
+        # validate exists
+        self.initial_state = self.states[id]
 
     # assertion must to be a z3 assertion
     def add_transition_between(self, source_id, target_id, label, assertion=TrueAssertion):
@@ -53,28 +58,58 @@ class AFSM:
     def get_states(self):
         return set(self.states.values())
 
-    # Hay que tener cuidado con el hecho de que los automatas tienen que tener distintos ids
-    # Depende de como definamos la igualdad de State.
     # Se esta asumiendo que tanto "self", como "afsm" son validos, i.e. que cumplen con lo que cumple un cfsm que son los que estamos usando de base.
-    def try_bisimulation_with(self, afsm):
+    def build_bisimulation_with(self, afsm):
+        relation = self._build_stratified_bisimulation_from(self._initial_relation(afsm))
+
+        # Si no obtuve una relacion de bisimulacion desde la relacion inicial, entonces no la voy a obtener sacando elementos.
+        # En lugar de devolver una relacion no valida, devuelvo un conjunto vacio.
+        if not self._is_a_bisimulation(afsm, relation):
+            relation = []
+
+        # Saco todos los elementos tq la relacion sigue siendo una bisimulacion
+        for i in range(0, len(relation)):
+            removed_element = relation.pop(0)
+            smallest_relation = self._build_stratified_bisimulation_from(relation)
+
+            # Si la nueva relacion es vacia, entonces el elemento que saque era necesario
+            if not self._is_a_bisimulation(afsm, smallest_relation):
+                relation.append(removed_element)
+
+        return set(relation)
+
+    def _initial_relation(self, afsm):
         assertions = self.all_assertions().union(afsm.all_assertions())
         all_posible_knowledge = set(powerset(assertions))
+        return list(product(self.get_states(), all_posible_knowledge, afsm.get_states()))
 
-        current_approximation = []
-        symmetric_current_approximation = []
-        # TODO: Hacer notar que nunca va a haber un problema con el orden en el que se genera el conocimiento.
-        next_approximation = list(product(self.get_states(), all_posible_knowledge, afsm.get_states()))
+    def _is_a_bisimulation(self, afms, relation):
+        initial_element = (self.initial_state, (), afms.initial_state)
+        return len(relation) > 0 and initial_element in relation
 
-        while current_approximation != next_approximation:
-            current_approximation = next_approximation
-            symmetric_current_approximation = [tuple(reversed(t)) for t in current_approximation]
-            next_approximation = []
+    def _build_stratified_bisimulation_from(self, initial_relation):
+        current_relation = []
+        symmetric_current_relation = []
+        next_relation = initial_relation
 
-            for (e, K, f) in current_approximation:
+        while current_relation != next_relation:
+            current_relation = next_relation
+            symmetric_current_relation = self._symmetric_relation_of(current_relation)
+            next_relation = []
+
+            for (e, K, f) in current_relation:
                 knowledge = set(K)
-                # si e puede imitar a f y f puede imitar a e (cayendo siempre dentro de la current_approximation) entonces tienen que estar en la siguiente aprox.
+                # si e puede imitar a f y f puede imitar a e (cayendo siempre dentro de la current_relation) entonces tienen que estar en la siguiente aprox.
                 # simetric en True porque va a ir a comprobar que exista (_e, _f) en la relacion en lugar de (_f, _e)
-                if e.is_able_to_simulate_falling_into(f, knowledge, current_approximation) and f.is_able_to_simulate_falling_into(e, knowledge, symmetric_current_approximation):
-                    next_approximation.append((e, K, f))
+                left_simulation = e.is_able_to_simulate_falling_into(f, knowledge, current_relation)
+                right_simulation = f.is_able_to_simulate_falling_into(e, knowledge, symmetric_current_relation)
 
-        return current_approximation #+ symmetric_current_approximation
+                both_happen = left_simulation and right_simulation
+
+                if both_happen:
+                    next_relation.append((e, K, f))
+
+        return current_relation
+
+    def _symmetric_relation_of(self, relation):
+        return [tuple(reversed(t)) for t in relation]

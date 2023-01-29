@@ -16,7 +16,7 @@ class State:
     def get_transitions_with(self, label):
         return self.graph.transitions_with_label_of(self.id, label)
 
-    def is_able_to_simulate_falling_into(self, simulation_state, knowledge, approximation):
+    def is_able_to_simulate_falling_into(self, simulation_state, knowledge, relation):
         is_able = True
         transitions = self.get_transitions()
         i = 0
@@ -35,7 +35,7 @@ class State:
             # Si existe, va a ser unico, ya que si existe mas de un subconjunto que hace esto, quiere decir que existen al menos dos transiciones desde "self"
             # tq. ambos caminos son validos para una traza valida. Esto nos daria un automata no-determinista, y estamos trabajando siempre con deterministas.
 
-            is_able = transition.exists_a_valid_transition_subset_wich_simulate(simulation_transitions, cleaned_knowledge, approximation)
+            is_able = transition.exists_a_valid_transition_subset_that_simulates(simulation_transitions, cleaned_knowledge, relation)
 
             i += 1
 

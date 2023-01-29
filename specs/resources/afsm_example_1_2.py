@@ -5,6 +5,8 @@ from z3 import Int
 afsm_example_1_2 = AFSM()
 
 afsm_example_1_2.add_states('q0', 'q1', 'q2', 'q3', 'q4')
+afsm_example_1_2.set_as_initial('q0')
+
 afsm_example_1_2.add_transition_between(
     'q0',
     'q1',
