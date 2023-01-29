@@ -1,6 +1,6 @@
 from models.state import State
 from models.transition import Transition
-from libs.tools import powerset
+from libs.tools import powerset, symetric_relation_of
 from z3 import BoolVal
 
 from itertools import product
@@ -78,38 +78,29 @@ class AFSM:
 
         return set(relation)
 
-    def _initial_relation(self, afsm):
-        assertions = self.all_assertions().union(afsm.all_assertions())
-        all_posible_knowledge = set(powerset(assertions))
-        return list(product(self.get_states(), all_posible_knowledge, afsm.get_states()))
-
-    def _is_a_bisimulation(self, afms, relation):
-        initial_element = (self.initial_state, (), afms.initial_state)
-        return len(relation) > 0 and initial_element in relation
-
     def _build_stratified_bisimulation_from(self, initial_relation):
         current_relation = []
-        symmetric_current_relation = []
         next_relation = initial_relation
 
         while current_relation != next_relation:
             current_relation = next_relation
-            symmetric_current_relation = self._symmetric_relation_of(current_relation)
             next_relation = []
 
-            for (e, K, f) in current_relation:
-                knowledge = set(K)
+            for (e, knowledge, f) in current_relation:
                 # si e puede imitar a f y f puede imitar a e (cayendo siempre dentro de la current_relation) entonces tienen que estar en la siguiente aprox.
-                # simetric en True porque va a ir a comprobar que exista (_e, _f) en la relacion en lugar de (_f, _e)
-                left_simulation = e.is_able_to_simulate_falling_into(f, knowledge, current_relation)
-                right_simulation = f.is_able_to_simulate_falling_into(e, knowledge, symmetric_current_relation)
+                e_is_able_to_simulate_f = e.is_able_to_simulate_falling_into(f, knowledge, current_relation)
+                f_is_able_to_simulate_e = f.is_able_to_simulate_falling_into(e, knowledge, symetric_relation_of(current_relation))
 
-                both_happen = left_simulation and right_simulation
-
-                if both_happen:
-                    next_relation.append((e, K, f))
+                if e_is_able_to_simulate_f and f_is_able_to_simulate_e:
+                    next_relation.append((e, knowledge, f))
 
         return current_relation
 
-    def _symmetric_relation_of(self, relation):
-        return [tuple(reversed(t)) for t in relation]
+    def _initial_relation(self, afsm):
+        assertions = self.all_assertions().union(afsm.all_assertions())
+        all_possible_knowledge = list(map(lambda knowledge: frozenset(knowledge), powerset(assertions)))
+        return list(product(self.get_states(), all_possible_knowledge, afsm.get_states()))
+
+    def _is_a_bisimulation(self, afsm, relation):
+        initial_element = (self.initial_state, frozenset(), afsm.initial_state)
+        return len(relation) > 0 and initial_element in relation

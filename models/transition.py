@@ -40,11 +40,11 @@ class Transition:
         while not fall_into_relation and k < len(simulation_transitions_subset):
             simulation_transition = simulation_transitions_subset[k]
 
-            # calculo el nuevo conocimiento
-            new_knowledge = {self.assertion, simulation_transition.assertion}
-
-            # TODO: Despues ver esto de la tupla, queda asi por como genera la aproximacion. Si es mucho lio, dejarlo asi
-            related_element = (self.target, tuple(knowledge.union(new_knowledge)), simulation_transition.target)
+            related_element = (
+                self.target,
+                knowledge.union({self.assertion, simulation_transition.assertion}),
+                simulation_transition.target
+            )
             fall_into_relation = related_element in relation
 
             k += 1
@@ -61,7 +61,7 @@ class Transition:
         # TODO: Me parece que tengo que usar el "prove"
         #  Por ejemplo: s.check(Implies(BoolVal(True), Int('x') > 0) da sat.
         #  Si bien existe un x que satisface eso, yo lo que quiero es ver si la formula logica es valida
-        #  prove(Implies(BoolVal(True), Int('x') > 0) == not proved
+        #  prove(Implies(BoolVal(True), Int('x') > 0) == not provedsimulation_transition
         solver = Solver()
 
         return solver.check(Implies(transition_knowledge, simulation_transition_knowledge)) == sat
