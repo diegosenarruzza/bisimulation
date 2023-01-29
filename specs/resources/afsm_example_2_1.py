@@ -11,11 +11,5 @@ afsm_example_2_1.add_transition_between(
     'p0',
     'p1',
     AssertableLabel('f(int x)', Int('x')),
-    Int('x') > 0
-)
-afsm_example_2_1.add_transition_between(
-    'p1',
-    'p0',
-    AssertableLabel('g(int y)', Int('y')),
-    Int('y') > Int('x')
+    Int('x') != 0
 )
