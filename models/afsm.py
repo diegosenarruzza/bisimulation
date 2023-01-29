@@ -88,8 +88,8 @@ class AFSM:
 
             for (e, knowledge, f) in current_relation:
                 # si e puede imitar a f y f puede imitar a e (cayendo siempre dentro de la current_relation) entonces tienen que estar en la siguiente aprox.
-                e_is_able_to_simulate_f = e.is_able_to_simulate_falling_into(f, knowledge, current_relation)
-                f_is_able_to_simulate_e = f.is_able_to_simulate_falling_into(e, knowledge, symetric_relation_of(current_relation))
+                e_is_able_to_simulate_f = e.is_able_to_simulate_falling_into(f, set(knowledge), current_relation)
+                f_is_able_to_simulate_e = f.is_able_to_simulate_falling_into(e, set(knowledge), symetric_relation_of(current_relation))
 
                 if e_is_able_to_simulate_f and f_is_able_to_simulate_e:
                     next_relation.append((e, knowledge, f))
