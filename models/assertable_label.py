@@ -12,3 +12,6 @@ class AssertableLabel:
 
     def has_variable(self):
         return self.variable is not None
+
+    def contains_any(self, variable_set):
+        return self.variable in variable_set

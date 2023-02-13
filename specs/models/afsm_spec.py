@@ -70,6 +70,10 @@ class AFSMCase(unittest.TestCase):
         relation = afsm_example_3_1.build_bisimulation_with(afsm_example_3_2)
         self._assert_relations_are_equals(expected_relation, relation)
 
+    def test_relation_must_be_empty_when_are_not_bisimilars(self):
+        relation = afsm_example_1.build_bisimulation_with(afsm_example_2_1)
+        self.assertEqual(set(), relation)
+
 
 if __name__ == '__main__':
     unittest.main()

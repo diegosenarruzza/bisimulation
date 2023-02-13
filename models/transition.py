@@ -58,10 +58,6 @@ class Transition:
         transition_knowledge = And(knowledge.union({self.assertion}))
         simulation_transition_knowledge = And(knowledge.union({Or(simulation_assertions)}))
 
-        # TODO: Me parece que tengo que usar el "prove"
-        #  Por ejemplo: s.check(Implies(BoolVal(True), Int('x') > 0) da sat.
-        #  Si bien existe un x que satisface eso, yo lo que quiero es ver si la formula logica es valida
-        #  prove(Implies(BoolVal(True), Int('x') > 0) == not provedsimulation_transition
         solver = Solver()
 
         return solver.check(Implies(transition_knowledge, simulation_transition_knowledge)) == sat

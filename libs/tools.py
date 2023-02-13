@@ -1,4 +1,7 @@
 from itertools import chain, combinations
+from z3 import BoolVal
+
+TrueAssertion = BoolVal(True)
 
 
 def powerset(iterable):
@@ -21,8 +24,15 @@ def collect_variables(assertion):
 
 # Devuelve un conjunto con las assertions cuyas variables no son las del "label".
 def clean_knowledge_for(knowledge, label):
-    return set([assertion for assertion in knowledge if label.variable not in collect_variables(assertion)])
+    return set([assertion for assertion in knowledge if not label.contains_any(collect_variables(assertion))])
 
 
 def symetric_relation_of(relation):
     return [tuple(reversed(t)) for t in relation]
+
+
+def merge_dicts(x, y):
+    """Given two dictionaries, merge them into a new dict as a shallow copy."""
+    z = x.copy()
+    z.update(y)
+    return z

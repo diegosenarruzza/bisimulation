@@ -1,11 +1,8 @@
 from models.state import State
 from models.transition import Transition
-from libs.tools import powerset, symetric_relation_of
-from z3 import BoolVal
+from libs.tools import powerset, symetric_relation_of, TrueAssertion
 
 from itertools import product
-
-TrueAssertion = BoolVal(True)
 
 
 class AFSM:
