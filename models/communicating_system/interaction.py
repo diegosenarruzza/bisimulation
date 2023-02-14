@@ -19,7 +19,7 @@ class Interaction:
 
     class Message:
 
-        def __init__(self, tag, payload):
+        def __init__(self, tag, payload=[]):
             self.tag = tag
             self.payload = payload  # Array of z3 variables: [ Int('x'), Boolean('y') ]
 
