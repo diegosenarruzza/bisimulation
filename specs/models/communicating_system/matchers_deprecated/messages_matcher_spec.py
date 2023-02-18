@@ -1,11 +1,11 @@
 import unittest
-from models.communicating_system.matchers.messages_matcher import match_messages
+from models.communicating_system.matchers_deprecated.messages_matcher import match_messages
 from models.communicating_system.interaction import Interaction
 from z3 import Int, Bool
 Message = Interaction.Message
 
 
-class MessageMatcher(unittest.TestCase):
+class MessagesMatcher(unittest.TestCase):
 
     def test_1_must_match_one_to_one(self):
         mf = Message('f')
