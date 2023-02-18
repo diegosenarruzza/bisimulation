@@ -35,3 +35,6 @@ class Interaction:
 
         def includes(self, variables):
             return any(var in self.payload for var in variables)
+
+        def payload_sort(self):
+            return list(map(lambda var: var.sort(), self.payload))
