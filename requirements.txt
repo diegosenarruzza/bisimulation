@@ -1,3 +1,6 @@
 boto==2.49.0
+numpy==1.19.5
+parsimonious==0.10.0
+regex==2022.10.31
 z3==0.2.0
 z3-solver==4.12.1.0
