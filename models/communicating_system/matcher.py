@@ -12,6 +12,9 @@ class Matcher:
         self.participants_match = {}
         self.messages_match = {}
 
+    def is_able_to_take_more_decisions(self):
+        return len(self.participant_candidates) > 0 or len(self.message_candidates) > 0
+
     # TODO: no tengo que asumir nada, y si no encuentro match posible esto tiene que tirar una excepcion.
     # Despues lo voy a necesitar para traducir al momento de usar el z3solver igualmente.
     def match_interaction(self, interaction):
