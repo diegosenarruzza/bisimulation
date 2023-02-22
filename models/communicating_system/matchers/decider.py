@@ -1,7 +1,10 @@
+from .decision import NoDecision
+
+
 class Decider:
 
     def __init__(self):
-        self.decisions = []
+        self.decisions = [NoDecision()]
 
     def take(self, decision):
         decision.decide()
@@ -21,3 +24,6 @@ class Decider:
             else:
                 # Si no tiene mas candidatos, la ultima decision ya no me sirve. Entonces sigo con la decision anterior.
                 self.next()
+
+    def has_more_decisions(self):
+        return len(self.decisions) > 0
