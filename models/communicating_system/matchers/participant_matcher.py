@@ -5,7 +5,7 @@ class ParticipantMatcher:
 
     def __init__(self, decider, candidates):
         self.decider = decider
-        self.candidates = set(candidates)
+        self.candidates = list(candidates)
         self.matches = {}
 
     def match(self, interaction):
@@ -27,7 +27,7 @@ class ParticipantMatcher:
         self.matches[matched] = candidate
 
     def rollback_match(self, matched, candidate):
-        self.candidates.add(candidate)
+        self.candidates.append(candidate)
         del self.matches[matched]
 
     def has_more_candidates(self):

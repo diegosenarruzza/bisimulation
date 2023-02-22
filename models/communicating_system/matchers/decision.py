@@ -10,7 +10,7 @@ class Decision:
         return len(self.candidates) > 0
 
     def decide(self):
-        self.current_candidate = self.candidates.pop()
+        self.current_candidate = self.candidates.pop(0)
         self.matcher.decide_match(self.matched, self.current_candidate)
 
     def rollback(self):
