@@ -40,7 +40,7 @@ class ParticipantMatcherTestCase(unittest.TestCase):
         old_sender, old_receiver = matcher.match(interaction)
         self.assertEqual(['p3'], matcher.candidates)
 
-        decider.next()
+        decider.take_next_decision()
         new_sender, new_receiver = matcher.match(interaction)
 
         self.assertEqual('p1', old_sender)

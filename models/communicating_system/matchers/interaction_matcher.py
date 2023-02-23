@@ -17,8 +17,14 @@ class InteractionMatcher:
 
         return Interaction(sender, receiver, message)
 
-    def next_match(self):
-        self.decider.next()
+    def match_next(self):
+        self.decider.take_next_decision()
 
-    def has_more_decisions(self):
-        return self.decider.has_more_decisions()
+    def has_more_possible_matches(self):
+        return self.decider.there_are_decisions_to_take()
+
+    def serialize(self):
+        return {
+            'participant_matches': self.participant_matcher.matches,
+            'message_matches': self.message_matcher.matches
+        }
