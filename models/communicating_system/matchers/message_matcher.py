@@ -11,28 +11,35 @@ class MessageMatcher:
         self.participant_matcher = participant_matcher
 
     def match(self, interaction):
-        valid_candidates = self.get_valid_candidates_set_for(interaction)
+        valid_candidates = self.valid_candidates_for(interaction)
         if len(valid_candidates) == 0:
-            raise Exception('no more candidates')
+            raise Exception(f'There is no valid candidates for interaction: {interaction}')
 
         message_hash = str(interaction.message)
         if message_hash not in self.matches:
             # De los canidatos validos, filtra por aquellos que esten dentro del conjunto de candidatos del matcher
-            candidates = [valid_candidate for valid_candidate in valid_candidates if valid_candidate in self.candidates]
+            candidates = self.message_candidates_from(valid_candidates)
+
+            if len(candidates) == 0:
+                raise Exception(f'There is no candidates for interaction: {interaction}')
+
             self.decider.take(
                 Decision(self, message_hash, candidates)
             )
 
         return self.matches[message_hash]
 
-    # Filtra las interacciones segun las que coinciden con el emisor y receptor de la interaccion recivida.
-    # Devuelve el conjunto de los mensajes, esos son los mensajes validos que pueden matchear con la interaccion recivida.
-    def get_valid_candidates_set_for(self, interaction):
+    # Los mensajes candidatos validos son aquellos cuyas interacciones son compatibles con la interaccion a matchear
+    def valid_candidates_for(self, interaction):
         return [
             candidate_interaction.message for candidate_interaction in self.interactions
             if self.interactions_are_compatibles(interaction, candidate_interaction)
 
         ]
+
+    # Son candidatos, para esta interaccion, los mensajes que estne en el conjunto de candidatos validos
+    def message_candidates_from(self, valid_candidates):
+        return [candidate for candidate in self.candidates if candidate in valid_candidates]
 
     def interactions_are_compatibles(self, matchable_interaction, candidate_interaction):
         sender, receiver = self.participant_matcher.match(matchable_interaction)

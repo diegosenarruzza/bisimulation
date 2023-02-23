@@ -82,6 +82,60 @@ class MessagesMatcherTestCase(unittest.TestCase):
         self.assertNotEqual(new_message, old_message)
         self.assertEqual([Message('m1')], matcher.candidates)
 
+    def test_04_must_raise_exception_when_there_is_no_more_candidates(self):
+        decider = Decider()
+        interaction_candidates = [
+            Interaction('p1', 'p2', Message('m1')),
+            Interaction('p2', 'p1', Message('m2'))
+        ]
+        message_candidates = [Message('m1'), Message('m2')]
+        participant_candidates = ['p1', 'p2']
+
+        participant_matcher = ParticipantMatcher(decider, participant_candidates)
+        matcher = MessageMatcher(decider, message_candidates, interaction_candidates, participant_matcher)
+
+        matchable_interaction = Interaction('c1', 'c2', Message('n1'))
+        non_matchable_interaction = Interaction('c1', 'c2', Message('n2'))
+
+        participant_matcher.match(matchable_interaction)
+        participant_matcher.match(non_matchable_interaction)
+
+        matcher.match(matchable_interaction)
+
+        self.assertRaises(
+            Exception,
+            f'There is no candidates for interaction: {non_matchable_interaction}',
+            matcher.match,
+            non_matchable_interaction
+        )
+
+    def test_05_must_raise_when_there_is_no_more_valid_candidates(self):
+        decider = Decider()
+        interaction_candidates = [
+            Interaction('p1', 'p2', Message('m1')),
+            Interaction('p2', 'p1', Message('m2'))
+        ]
+        message_candidates = [Message('m1'), Message('m2')]
+        participant_candidates = ['p1', 'p2']
+
+        participant_matcher = ParticipantMatcher(decider, participant_candidates)
+        matcher = MessageMatcher(decider, message_candidates, interaction_candidates, participant_matcher)
+
+        matchable_interaction = Interaction('c1', 'c2', Message('n1'))
+        non_matchable_interaction = Interaction('c2', 'c1', Message('n2'))
+
+        participant_matcher.match(matchable_interaction)
+        participant_matcher.match(non_matchable_interaction)
+
+        matcher.match(matchable_interaction)
+
+        self.assertRaises(
+            Exception,
+            f'There is no valid candidates for interaction: {non_matchable_interaction}',
+            matcher.match,
+            non_matchable_interaction
+        )
+
 
 if __name__ == '__main__':
     unittest.main()
