@@ -2,6 +2,7 @@ import unittest
 from models.communicating_system.matchers.participant_matcher import ParticipantMatcher
 from models.communicating_system.matchers.message_matcher import MessageMatcher
 from models.communicating_system.matchers.decider import Decider
+from models.communicating_system.matchers.no_candidate_match_exception import NoCandidateMatchException
 from models.communicating_system.interaction import Interaction
 Message = Interaction.Message
 
@@ -76,7 +77,7 @@ class MessagesMatcherTestCase(unittest.TestCase):
         old_message = matcher.match(matchable_interaction)
         self.assertEqual([Message('m2')], matcher.candidates)
 
-        decider.next()
+        decider.take_next_decision()
         new_message = matcher.match(matchable_interaction)
 
         self.assertNotEqual(new_message, old_message)
@@ -102,11 +103,12 @@ class MessagesMatcherTestCase(unittest.TestCase):
 
         matcher.match(matchable_interaction)
 
-        self.assertRaises(
-            Exception,
+        with self.assertRaises(NoCandidateMatchException) as ctx:
+            matcher.match(non_matchable_interaction)
+
+        self.assertEqual(
             f'There is no candidates for interaction: {non_matchable_interaction}',
-            matcher.match,
-            non_matchable_interaction
+            str(ctx.exception)
         )
 
     def test_05_must_raise_when_there_is_no_more_valid_candidates(self):
@@ -116,24 +118,25 @@ class MessagesMatcherTestCase(unittest.TestCase):
             Interaction('p2', 'p1', Message('m2'))
         ]
         message_candidates = [Message('m1'), Message('m2')]
-        participant_candidates = ['p1', 'p2']
+        participant_candidates = ['p1', 'p2', 'p3']
 
         participant_matcher = ParticipantMatcher(decider, participant_candidates)
         matcher = MessageMatcher(decider, message_candidates, interaction_candidates, participant_matcher)
 
         matchable_interaction = Interaction('c1', 'c2', Message('n1'))
-        non_matchable_interaction = Interaction('c2', 'c1', Message('n2'))
+        non_matchable_interaction = Interaction('c2', 'c3', Message('n2'))
 
         participant_matcher.match(matchable_interaction)
         participant_matcher.match(non_matchable_interaction)
 
         matcher.match(matchable_interaction)
 
-        self.assertRaises(
-            Exception,
+        with self.assertRaises(NoCandidateMatchException) as ctx:
+            matcher.match(non_matchable_interaction)
+
+        self.assertEqual(
             f'There is no valid candidates for interaction: {non_matchable_interaction}',
-            matcher.match,
-            non_matchable_interaction
+            str(ctx.exception)
         )
 
 

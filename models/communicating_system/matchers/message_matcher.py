@@ -1,4 +1,5 @@
 from .decision import Decision
+from .no_candidate_match_exception import NoCandidateMatchException
 
 
 class MessageMatcher:
@@ -13,7 +14,7 @@ class MessageMatcher:
     def match(self, interaction):
         valid_candidates = self.valid_candidates_for(interaction)
         if len(valid_candidates) == 0:
-            raise Exception(f'There is no valid candidates for interaction: {interaction}')
+            raise NoCandidateMatchException(f'There is no valid candidates for interaction: {interaction}')
 
         message_hash = str(interaction.message)
         if message_hash not in self.matches:
@@ -21,7 +22,7 @@ class MessageMatcher:
             candidates = self.message_candidates_from(valid_candidates)
 
             if len(candidates) == 0:
-                raise Exception(f'There is no candidates for interaction: {interaction}')
+                raise NoCandidateMatchException(f'There is no candidates for interaction: {interaction}')
 
             self.decider.take(
                 Decision(self, message_hash, candidates)

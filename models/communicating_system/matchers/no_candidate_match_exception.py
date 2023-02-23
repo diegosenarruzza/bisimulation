@@ -1,0 +1,2 @@
+class NoCandidateMatchException(Exception):
+    pass
