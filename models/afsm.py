@@ -1,8 +1,7 @@
 from models.state import State
 from models.transition import Transition
-from libs.tools import powerset, symetric_relation_of, TrueAssertion
-
-from itertools import product
+from libs.tools import TrueAssertion
+from .stratified_bisimulation_strategies.shared_language_strategy import SharedLanguagesBisimulationStrategy
 
 
 class AFSM:
@@ -12,20 +11,20 @@ class AFSM:
         self.transitions_by_source_id = {}
         self.initial_state = None
 
-    def add_state(self, id):
+    def add_state(self, state_id):
         # validate not present
-        self.states[id] = State(self, id)
-        self.transitions_by_source_id[id] = []
+        self.states[state_id] = State(self, state_id)
+        self.transitions_by_source_id[state_id] = []
 
     def add_states(self, *ids):
-        for id in ids:
-            self.add_state(id)
+        for state_id in ids:
+            self.add_state(state_id)
 
-    def set_as_initial(self, id):
+    def set_as_initial(self, state_id):
         # validate exists
-        self.initial_state = self.states[id]
+        self.initial_state = self.states[state_id]
 
-    # assertion must to be a z3 assertion
+    # assertion must be a z3 assertion
     def add_transition_between(self, source_id, target_id, label, assertion=TrueAssertion):
         # validate present
         # validate transition not exist
@@ -37,12 +36,12 @@ class AFSM:
 
         self.transitions_by_source_id[source_id].append(transition)
 
-    def transitions_of(self, id):
+    def transitions_of(self, state_id):
         #  validate present
-        return self.transitions_by_source_id[id]
+        return self.transitions_by_source_id[state_id]
 
-    def transitions_with_label_of(self, id, label):
-        return set(filter(lambda transition: transition.label == label, self.transitions_of(id)))
+    def transitions_with_label_of(self, state_id, label):
+        return set(filter(lambda transition: transition.label == label, self.transitions_of(state_id)))
 
     def all_assertions(self):
         return set(
@@ -57,47 +56,9 @@ class AFSM:
 
     # Se esta asumiendo que tanto "self", como "afsm" son validos, i.e. que cumplen con lo que cumple un cfsm que son los que estamos usando de base.
     def build_bisimulation_with(self, afsm):
-        relation = self._build_stratified_bisimulation_from(self._initial_relation(afsm))
+        strategy = self._bisimulation_strategy_with(afsm)
+        strategy.execute()
+        return strategy.result()
 
-        # Si no obtuve una relacion de bisimulacion desde la relacion inicial, entonces no la voy a obtener sacando elementos.
-        # En lugar de devolver una relacion no valida, devuelvo un conjunto vacio.
-        if not self._is_a_bisimulation(afsm, relation):
-            relation = []
-
-        # Saco todos los elementos tq la relacion sigue siendo una bisimulacion
-        for i in range(0, len(relation)):
-            removed_element = relation.pop(0)
-            smallest_relation = self._build_stratified_bisimulation_from(relation)
-
-            # Si la nueva relacion es vacia, entonces el elemento que saque era necesario
-            if not self._is_a_bisimulation(afsm, smallest_relation):
-                relation.append(removed_element)
-
-        return set(relation).union(set(symetric_relation_of(relation)))
-
-    def _build_stratified_bisimulation_from(self, initial_relation):
-        current_relation = []
-        next_relation = initial_relation
-
-        while current_relation != next_relation:
-            current_relation = next_relation
-            next_relation = []
-
-            for (e, knowledge, f) in current_relation:
-                # si e puede imitar a f y f puede imitar a e (cayendo siempre dentro de la current_relation) entonces tienen que estar en la siguiente aprox.
-                e_is_able_to_simulate_f = e.is_able_to_simulate_falling_into(f, set(knowledge), current_relation)
-                f_is_able_to_simulate_e = f.is_able_to_simulate_falling_into(e, set(knowledge), symetric_relation_of(current_relation))
-
-                if e_is_able_to_simulate_f and f_is_able_to_simulate_e:
-                    next_relation.append((e, knowledge, f))
-
-        return current_relation
-
-    def _initial_relation(self, afsm):
-        assertions = self.all_assertions().union(afsm.all_assertions())
-        all_possible_knowledge = list(map(lambda knowledge: frozenset(knowledge), powerset(assertions)))
-        return list(product(self.get_states(), all_possible_knowledge, afsm.get_states()))
-
-    def _is_a_bisimulation(self, afsm, relation):
-        initial_element = (self.initial_state, frozenset(), afsm.initial_state)
-        return len(relation) > 0 and initial_element in relation
+    def _bisimulation_strategy_with(self, afsm):
+        return SharedLanguagesBisimulationStrategy(self, afsm)

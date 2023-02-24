@@ -36,7 +36,7 @@ class SharedLanguagesBisimulationStrategy:
 
     def _initial_relation(self):
         assertions = self.afsm_left.all_assertions().union(self.afsm_right.all_assertions())
-        all_possible_knowledge = list(map(lambda knowledge: frozenset(knowledge), powerset(assertions)))
+        all_possible_knowledge = [frozenset(knowledge) for knowledge in powerset(assertions)]
         return list(product(self.afsm_left.get_states(), all_possible_knowledge, self.afsm_right.get_states()))
 
     def _set_initial_relation(self):
