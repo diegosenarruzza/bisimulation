@@ -1,8 +1,8 @@
 from .match_exception import MatchException
-from .shared_language_strategy import SharedLanguagesBisimulationStrategy
+from .shared_language_strategy import SharedLanguageBisimulationStrategy
 
 
-class NonSharedLanguageBisimulationStrategy(SharedLanguagesBisimulationStrategy):
+class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
 
     def __init__(self, afsm_left, afsm_right, initial_relation=None, matcher=None):
         super().__init__(afsm_left, afsm_right, initial_relation)

@@ -1,7 +1,7 @@
 from models.state import State
 from models.transition import Transition
 from libs.tools import TrueAssertion
-from .stratified_bisimulation_strategies.shared_language_strategy import SharedLanguagesBisimulationStrategy
+from .stratified_bisimulation_strategies.shared_language_strategy import SharedLanguageBisimulationStrategy
 
 
 class AFSM:
@@ -61,4 +61,4 @@ class AFSM:
         return strategy.result()
 
     def _bisimulation_strategy_with(self, afsm):
-        return SharedLanguagesBisimulationStrategy(self, afsm)
+        return SharedLanguageBisimulationStrategy(self, afsm)

@@ -3,7 +3,7 @@ from itertools import product
 from z3 import Solver, sat, And, Or, Implies
 
 
-class SharedLanguagesBisimulationStrategy:
+class SharedLanguageBisimulationStrategy:
 
     def __init__(self, afsm_left, afsm_right, initial_relation=None):
         self.afsm_left = afsm_left
