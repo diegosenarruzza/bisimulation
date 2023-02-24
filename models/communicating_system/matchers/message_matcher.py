@@ -1,5 +1,6 @@
 from .decision import Decision
 from .no_candidate_match_exception import NoCandidateMatchException
+from .variable_matcher import VariableMatcher
 
 
 class MessageMatcher:
@@ -10,6 +11,7 @@ class MessageMatcher:
         self.interactions = interactions
         self.matches = {}
         self.participant_matcher = participant_matcher
+        self.variable_matcher = VariableMatcher()
 
     def match(self, interaction):
         valid_candidates = self.valid_candidates_for(interaction)
@@ -25,7 +27,7 @@ class MessageMatcher:
                 raise NoCandidateMatchException(f'There is no candidates for interaction: {interaction}')
 
             self.decider.take(
-                Decision(self, message_hash, candidates)
+                Decision(self, interaction.message, candidates)
             )
 
         return self.matches[message_hash]
@@ -50,8 +52,10 @@ class MessageMatcher:
 
     def decide_match(self, matched, candidate):
         self.candidates.remove(candidate)
-        self.matches[matched] = candidate
+        self.matches[str(matched)] = candidate
+        self.variable_matcher.decide_match(matched, candidate)
 
     def rollback_match(self, matched, candidate):
         self.candidates.append(candidate)
-        del self.matches[matched]
+        del self.matches[str(matched)]
+        self.variable_matcher.rollback_match(matched, candidate)

@@ -61,6 +61,9 @@ class InteractionMatcherTestCase(unittest.TestCase):
         matcher.match_next()
         self.assertTrue(matcher.has_more_possible_matches())
 
+        matcher.match_next()
+        self.assertFalse(matcher.has_more_possible_matches())
+
 
 if __name__ == '__main__':
     unittest.main()

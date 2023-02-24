@@ -4,6 +4,7 @@ from models.communicating_system.matchers.message_matcher import MessageMatcher
 from models.communicating_system.matchers.decider import Decider
 from models.communicating_system.matchers.no_candidate_match_exception import NoCandidateMatchException
 from models.communicating_system.interaction import Interaction
+from z3 import Int
 Message = Interaction.Message
 
 
@@ -138,6 +139,29 @@ class MessagesMatcherTestCase(unittest.TestCase):
             f'There is no valid candidates for interaction: {non_matchable_interaction}',
             str(ctx.exception)
         )
+
+    def test_06_must_match_variables(self):
+        decider = Decider()
+        m1 = Message('m1', [Int('x'), Int('y')])
+        interaction_candidates = [Interaction('p1', 'p2', m1)]
+        message_candidates = [m1]
+        participant_candidates = ['p1', 'p2']
+
+        participant_matcher = ParticipantMatcher(decider, participant_candidates)
+        matcher = MessageMatcher(decider, message_candidates, interaction_candidates, participant_matcher)
+
+        n1 = Message('n1', [Int('a'), Int('b')])
+        matchable_interaction = Interaction('c1', 'c2', n1)
+
+        participant_matcher.match(matchable_interaction)
+        matched_message = matcher.match(matchable_interaction)
+
+        self.assertEqual(m1, matched_message)
+        expected_variable_matches = {
+            Int('a'): Int('x'),
+            Int('b'): Int('y')
+        }
+        self.assertEqual(expected_variable_matches, matcher.variable_matcher.matches)
 
 
 if __name__ == '__main__':
