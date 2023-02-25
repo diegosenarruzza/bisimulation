@@ -1,7 +1,7 @@
 from models.communicating_system.cfsm import CommunicatingFiniteStateMachine
 from z3 import Int
 
-cfsm_1 = CommunicatingFiniteStateMachine('consumer', 'producer')
+cfsm_1 = CommunicatingFiniteStateMachine(['consumer', 'producer'])
 
 cfsm_1.add_states('p0', 'p1')
 cfsm_1.set_as_initial('p0')
@@ -13,7 +13,7 @@ cfsm_1.add_transition_between(
     Int('x') > 0
 )
 
-cfsm_2 = CommunicatingFiniteStateMachine('client', 'shop')
+cfsm_2 = CommunicatingFiniteStateMachine(['client', 'shop'])
 
 # state names is not important, cause are not part of match.
 # I set different to be not confuse in tests

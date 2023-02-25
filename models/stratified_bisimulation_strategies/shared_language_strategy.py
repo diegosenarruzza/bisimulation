@@ -11,9 +11,10 @@ class SharedLanguageBisimulationStrategy:
         self.symmetric_mode = False
         self.current_relation = None
         self.current_knowledge = None
+        self.current_simulated_transition = None
 
     def execute(self):
-        self._set_initial_relation()
+        self._set_initial_relation_as_current()
         self._calculate_bisimulation_relation()
 
         # La relacion puede no ser una bisimulacion porque: no tiene elementos o, no esta el elemento inicial
@@ -26,21 +27,20 @@ class SharedLanguageBisimulationStrategy:
     def result(self):
         return set(self.current_relation)
 
-    def _set_initial_relation(self):
-        if self.current_relation is None:
-            self.current_relation = self._initial_relation()
-
-    def _initial_relation(self):
-        assertions = self.afsm_left.all_assertions().union(self.afsm_right.all_assertions())
-        all_possible_knowledge = [frozenset(knowledge) for knowledge in powerset(assertions)]
-        return list(product(self.afsm_left.get_states(), all_possible_knowledge, self.afsm_right.get_states()))
-
     def result_is_a_bisimulation(self):
         if self.current_relation is None:
             return False
 
         initial_element = (self.afsm_left.initial_state, frozenset(), self.afsm_right.initial_state)
         return len(self.current_relation) > 0 and initial_element in self.current_relation
+
+    def _set_initial_relation_as_current(self):
+        self.current_relation = self._initial_relation()
+
+    def _initial_relation(self):
+        assertions = self.afsm_left.all_assertions().union(self.afsm_right.all_assertions())
+        all_possible_knowledge = [frozenset(knowledge) for knowledge in powerset(assertions)]
+        return list(product(self.afsm_left.get_states(), all_possible_knowledge, self.afsm_right.get_states()))
 
     def _minimize_current_relation(self):
         # Saco todos los elementos tq la relacion sigue siendo una bisimulacion
@@ -81,38 +81,37 @@ class SharedLanguageBisimulationStrategy:
 
     def _is_able_to_simulate_falling_into(self, simulated_state, simulating_state):
         is_able = True
-        transitions = simulated_state.get_transitions()
+        simulated_transitions = simulated_state.get_transitions()
         i = 0
 
         # Si corta porque no cumple is_able, entonces es porque existe una accion que "simulating_state" no puede simular, o que puede pero no cae en la relacion
         # Si corta porque i < len(transitions) entonces recorrio todas las acciones y "simulating_state" siempre pudo simular a e y caer dentro de la relacion
-        while is_able and i < len(transitions):
-            transition = transitions[i]
-            label = transition.label
+        while is_able and i < len(simulated_transitions):
+            self.current_simulated_transition = simulated_transitions[i]
 
             # Saco las assertions cuyas variables van a ser sobreescritas por la transicion actual
-            if label.has_variable():
-                self._clean_knowledge_with(label)
+            self._clean_knowledge()
 
-            simulating_transitions = self._get_transitions_with_label_from(simulating_state, label)
+            simulating_transitions = self._get_transitions_with_simulated_label_from(simulating_state)
 
-            # Necesito verificar si existe algun subconjunto de transiciones desde "simulation_state", que me sirva para simular la transicion de "self"
-            # Si existe, va a ser unico, ya que si existe mas de un subconjunto que hace esto, quiere decir que existen al menos dos transiciones desde "self"
+            # Necesito verificar si existe algun subconjunto de transiciones desde "simulating_state", que me sirva para simular la transicion de el "simulated_state"
+            # Si existe, va a ser unico, ya que si existe mas de un subconjunto que hace esto, quiere decir que existen al menos dos transiciones desde "simulated_state"
             # tq. ambos caminos son validos para una traza valida. Esto nos daria un automata no-determinista, y estamos trabajando siempre con deterministas.
 
-            is_able = self._exists_a_valid_transition_subset_that_simulates(transition, simulating_transitions)
+            is_able = self._exists_a_valid_transition_subset_that_simulates(simulating_transitions)
 
             i += 1
 
         return is_able
 
-    def _clean_knowledge_with(self, label):
-        self.current_knowledge = clean_knowledge_for(self.current_knowledge, label)
+    def _clean_knowledge(self):
+        if self.current_simulated_transition.label.has_variable():
+            self.current_knowledge = clean_knowledge_for(self.current_knowledge, self.current_simulated_transition.label)
 
-    def _get_transitions_with_label_from(self, state, label):
-        return state.get_transitions_with(label)
+    def _get_transitions_with_simulated_label_from(self, simulating_state):
+        return simulating_state.get_transitions_with(self.current_simulated_transition.label)
 
-    def _exists_a_valid_transition_subset_that_simulates(self, simulated_transition, simulating_transitions):
+    def _exists_a_valid_transition_subset_that_simulates(self, simulating_transitions):
         # No tomo el subconjunto vacio porque no seria valido. Si no hay mas conjuntos que el vacio, entonces nunca entra al loop y devuelve False
         simulating_transitions_subsets = list(powerset(simulating_transitions))
         simulating_transitions_subsets.remove(())
@@ -124,25 +123,25 @@ class SharedLanguageBisimulationStrategy:
             simulating_transitions_subset = list(simulating_transitions_subsets[j])
 
             # si encontre un sub-conjunto de transiciones, cuya implicacion es satisfacible y ademas cae dentro de la aproximacion, entonces es valido
-            valid_transitions_set_exists = self._is_able_to_simulate_knowledge(simulated_transition, simulating_transitions_subset) and \
-                                           self._transitions_subset_fall_into_relation(simulated_transition, simulating_transitions_subset)
+            valid_transitions_set_exists = self._is_able_to_simulate_knowledge(simulating_transitions_subset) and \
+                                           self._transitions_subset_fall_into_relation(simulating_transitions_subset)
 
             j += 1
 
         return valid_transitions_set_exists
 
     # Usamos z3-prover. Las assertions tienen que estar escritas con este framework.
-    def _is_able_to_simulate_knowledge(self, simulated_transition, simulation_transitions_subset):
+    def _is_able_to_simulate_knowledge(self, simulation_transitions_subset):
         simulation_assertions = {transition.assertion for transition in simulation_transitions_subset}
 
-        transition_knowledge = And(self.current_knowledge.union({simulated_transition.assertion}))
+        transition_knowledge = And(self.current_knowledge.union({self.current_simulated_transition.assertion}))
         simulation_transition_knowledge = And(self.current_knowledge.union({Or(simulation_assertions)}))
 
         solver = Solver()
 
         return solver.check(Implies(transition_knowledge, simulation_transition_knowledge)) == sat
 
-    def _transitions_subset_fall_into_relation(self, simulated_transition, simulating_transitions_subset):
+    def _transitions_subset_fall_into_relation(self, simulating_transitions_subset):
         fall_into_current_relation = False
         k = 0
 
@@ -153,13 +152,13 @@ class SharedLanguageBisimulationStrategy:
             if self.symmetric_mode:
                 related_element = (
                     simulating_transition.target,
-                    self.current_knowledge.union({simulated_transition.assertion, simulating_transition.assertion}),
-                    simulated_transition.target
+                    self.current_knowledge.union({self.current_simulated_transition.assertion, simulating_transition.assertion}),
+                    self.current_simulated_transition.target
                 )
             else:
                 related_element = (
-                    simulated_transition.target,
-                    self.current_knowledge.union({simulated_transition.assertion, simulating_transition.assertion}),
+                    self.current_simulated_transition.target,
+                    self.current_knowledge.union({self.current_simulated_transition.assertion, simulating_transition.assertion}),
                     simulating_transition.target
                 )
 

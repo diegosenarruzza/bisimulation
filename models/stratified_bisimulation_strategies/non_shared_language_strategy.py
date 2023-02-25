@@ -7,30 +7,47 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
     def __init__(self, afsm_left, afsm_right, matcher):
         super().__init__(afsm_left, afsm_right)
         self.matcher = matcher
+        self.initial_relation = None
 
     def execute(self):
-        while not self.result_is_a_bisimulation() and self.matcher.has_more_possible_matches:
-            self._set_initial_relation()
-            try:
-                self._calculate_bisimulation_relation()
-            except MatchException:
-                pass
-            self.matcher.match_next()
-
-        if not self.result_is_a_bisimulation():
-            self._invalidate_current_relation()
-
+        self._try_calculate_bisimulation_relation()
         self._minimize_current_relation()
 
     def result(self):
         return super().result(), self.matcher.serialize()
 
-    def _get_transitions_with_label_from(self, state, label):
-        matched_label = self.matcher.match(label)
-        return super()._get_transitions_with_label_from(state, matched_label)
+    def _try_calculate_bisimulation_relation(self):
+        self._set_initial_relation_as_current()
+        try:
+            self._calculate_bisimulation_relation()
+            if not self.result_is_a_bisimulation():
+                self._retry_if_is_possible()
+        except MatchException:
+            self._retry_if_is_possible()
 
-    def _clean_knowledge_with(self, label):
-        super()._clean_knowledge_with(label)
+    def _retry_if_is_possible(self):
+        self.matcher.match_next()
+        if self.matcher.has_more_possible_matches():
+            self._try_calculate_bisimulation_relation()
+        else:
+            self._invalidate_current_relation()
+
+    def _set_initial_relation_as_current(self):
+        self.current_relation = self._initial_relation()
+
+    def _initial_relation(self):
+        if self.initial_relation is None:
+            self.initial_relation = super()._initial_relation()
+
+        return self.initial_relation
+
+    def _get_transitions_with_simulated_label_from(self, simulating_state):
+        matched_label = self.matcher.match(self.current_simulated_transition.label)
+        return simulating_state.get_transitions_with(matched_label)
+
+    #
+    # def _clean_knowledge(self):
+    #     super()._clean_knowledge()
         # TODO: ver si tengo que matchear
         # self.current_knowledge = clean_knowledge_for(self.current_knowledge, label)
 

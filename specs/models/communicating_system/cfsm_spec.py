@@ -48,7 +48,7 @@ class CFSMTestCase(unittest.TestCase):
             'variable_matches': {Int('number'): Int('x')}
         }
 
-        relation, matches = cfsm_example_1.calculate_bisimulation_with(cfsm_example_1)
+        relation, matches = cfsm_example_2_1.calculate_bisimulation_with(cfsm_example_2_2)
 
         self.assertEqual(expected_relation, relation)
         self.assertEqual(expected_matches, matches)

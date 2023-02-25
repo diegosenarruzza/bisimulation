@@ -7,9 +7,9 @@ from models.stratified_bisimulation_strategies.non_shared_language_strategy impo
 
 class CommunicatingFiniteStateMachine(AFSM):
 
-    def __init__(self, *participants):
+    def __init__(self, participants):
         # TODO: Verify are not repeated
-        self.participants = set(participants)
+        self.participants = participants
         super().__init__()
 
     def add_transition_between(self, source_id, target_id, interaction_string, assertion=TrueAssertion):
@@ -33,6 +33,6 @@ class CommunicatingFiniteStateMachine(AFSM):
 
     def _interaction_matcher(self):
         interactions = [transition.label for transition in self._all_transitions()]
-        participant_candidates = list(self.participants)
+        participant_candidates = self.participants
         message_candidates = [transition.label.message for transition in self._all_transitions()]
         return InteractionMatcher(interactions, participant_candidates, message_candidates)
