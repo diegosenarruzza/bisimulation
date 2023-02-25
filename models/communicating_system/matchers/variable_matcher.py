@@ -17,3 +17,8 @@ class VariableMatcher:
     def rollback_match(self, matched_message, candidate_message):
         for matched_variable in matched_message.payload:
             del self.matches[matched_variable]
+
+    def serialize(self):
+        return {
+            'variable_matches': self.matches
+        }

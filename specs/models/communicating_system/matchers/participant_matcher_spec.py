@@ -16,7 +16,7 @@ class ParticipantMatcherTestCase(unittest.TestCase):
         self.assertNotEqual(matched_sender, matched_receiver)
         self.assertIn(matched_sender, candidates)
         self.assertIn(matched_receiver, candidates)
-        self.assertTrue(matcher.has_more_candidates())
+        self.assertEqual(['p3'], matcher.candidates)
 
     def test_02_must_respect_matches(self):
         candidates = ['p1', 'p2', 'p3']
@@ -29,7 +29,7 @@ class ParticipantMatcherTestCase(unittest.TestCase):
         self.assertEqual(sender_1, sender_2)
         self.assertEqual(sender_1, receiver_3)
         self.assertEqual(receiver_2, sender_3)
-        self.assertFalse(matcher.has_more_candidates())
+        self.assertEqual([], matcher.candidates)
 
     def test_03_rollback_last_decision_must_take_new_candidate(self):
         candidates = ['p1', 'p2', 'p3']

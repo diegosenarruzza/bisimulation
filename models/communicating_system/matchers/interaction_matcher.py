@@ -2,6 +2,7 @@ from ..interaction import Interaction
 from .decider import Decider
 from .participant_matcher import ParticipantMatcher
 from .message_matcher import MessageMatcher
+from libs.tools import merge_dicts
 
 
 class InteractionMatcher:
@@ -24,7 +25,7 @@ class InteractionMatcher:
         return self.decider.there_are_decisions_to_take()
 
     def serialize(self):
-        return {
-            'participant_matches': self.participant_matcher.matches,
-            'message_matches': self.message_matcher.matches
-        }
+        return merge_dicts(
+            self.participant_matcher.serialize(),
+            self.message_matcher.serialize()
+        )

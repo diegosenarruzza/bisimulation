@@ -1,7 +1,7 @@
 from .decision import Decision
 from .no_candidate_match_exception import NoCandidateMatchException
 from .variable_matcher import VariableMatcher
-
+from libs.tools import merge_dicts
 
 class MessageMatcher:
 
@@ -59,3 +59,9 @@ class MessageMatcher:
         self.candidates.append(candidate)
         del self.matches[str(matched)]
         self.variable_matcher.rollback_match(matched, candidate)
+
+    def serialize(self):
+        return merge_dicts(
+            {'message_matches': self.matches},
+            self.variable_matcher.serialize()
+        )

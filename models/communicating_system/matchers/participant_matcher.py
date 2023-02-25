@@ -30,5 +30,7 @@ class ParticipantMatcher:
         self.candidates.append(candidate)
         del self.matches[matched]
 
-    def has_more_candidates(self):
-        return len(self.candidates) > 0
+    def serialize(self):
+        return {
+            'participant_matches': self.matches
+        }
