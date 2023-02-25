@@ -1,9 +1,9 @@
 import unittest
-from specs.resources.afsm_example_1 import afsm_example_1
-from specs.resources.afsm_example_2_1 import afsm_example_2_1
-from specs.resources.afsm_example_2_2 import afsm_example_2_2
-from specs.resources.afsm_example_3_1 import afsm_example_3_1
-from specs.resources.afsm_example_3_2 import afsm_example_3_2
+from specs.resources.afsm.afsm_example_1 import afsm_example_1
+from specs.resources.afsm.afsm_example_2_1 import afsm_example_2_1
+from specs.resources.afsm.afsm_example_2_2 import afsm_example_2_2
+from specs.resources.afsm.afsm_example_3_1 import afsm_example_3_1
+from specs.resources.afsm.afsm_example_3_2 import afsm_example_3_2
 from z3 import Int, BoolVal
 TrueAssertion = BoolVal(True)
 
@@ -19,7 +19,7 @@ class AFSMCase(unittest.TestCase):
             (p1, frozenset({Int('x') > 0}), p1),
             (p0, frozenset({Int('x') > 0, Int('y') > Int('x')}), p0)
         }
-        relation = afsm_example_1.build_bisimulation_with(afsm_example_1)
+        relation = afsm_example_1.calculate_bisimulation_with(afsm_example_1)
         self.assertEqual(expected_relation, relation)
 
     def test_must_be_bisimilars_example_2(self):
@@ -35,7 +35,7 @@ class AFSMCase(unittest.TestCase):
             (p1, frozenset({x != 0, x > 0}), q1),
             (p1, frozenset({x != 0, x < 0}), q1)
         }
-        relation = afsm_example_2_1.build_bisimulation_with(afsm_example_2_2)
+        relation = afsm_example_2_1.calculate_bisimulation_with(afsm_example_2_2)
         self.assertEqual(expected_relation, relation)
 
     def test_must_be_bisimilars_example_3(self):
@@ -59,11 +59,11 @@ class AFSMCase(unittest.TestCase):
             (p2, frozenset({x != 0, x < 0, TrueAssertion}), q3),
             (p3, frozenset({x != 0, x < 0, TrueAssertion}), q4),
         }
-        relation = afsm_example_3_1.build_bisimulation_with(afsm_example_3_2)
+        relation = afsm_example_3_1.calculate_bisimulation_with(afsm_example_3_2)
         self.assertEqual(expected_relation, relation)
 
     def test_relation_must_be_empty_when_are_not_bisimilars(self):
-        relation = afsm_example_1.build_bisimulation_with(afsm_example_2_1)
+        relation = afsm_example_1.calculate_bisimulation_with(afsm_example_2_1)
         self.assertEqual(set(), relation)
 
 

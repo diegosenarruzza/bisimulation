@@ -6,7 +6,7 @@ class InteractionParser:
 
     def parse(self, interaction_string):
         communication, message = self._split_interaction(interaction_string)
-        sender, receiver, action = self._parse_communication(communication)
+        sender, receiver = self._parse_communication(communication)
         tag, payload = self._parse_message(message)
 
         message = Interaction.Message(tag, payload)
@@ -18,11 +18,8 @@ class InteractionParser:
 
     # Asumimos que los participants son representados SOLOS con un char. Ej:'wv!', 'pq?'
     def _parse_communication(self, communication):
-        participant_1, participant_2, action = communication
-        if action == '!':
-            return [participant_1, participant_2, action]
-        else: # if action == '?'
-            return [participant_2, participant_1, action]
+        sender, receiver = communication.split('->')
+        return sender.strip(), receiver.strip()
 
     def _parse_message(self, message):
         open_payload_index = message.find('(')

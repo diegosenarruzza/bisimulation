@@ -4,25 +4,34 @@ from .shared_language_strategy import SharedLanguageBisimulationStrategy
 
 class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
 
-    def __init__(self, afsm_left, afsm_right, initial_relation=None, matcher=None):
-        super().__init__(afsm_left, afsm_right, initial_relation)
+    def __init__(self, afsm_left, afsm_right, matcher):
+        super().__init__(afsm_left, afsm_right)
         self.matcher = matcher
 
     def execute(self):
-        # is a do-while
-        self.try_execute()
-
-        while not self.result_is_a_bisimulation() and self.matcher.has_more_possible_matches():
+        while not self.result_is_a_bisimulation() and self.matcher.has_more_possible_matches:
+            self._set_initial_relation()
+            try:
+                self._calculate_bisimulation_relation()
+            except MatchException:
+                pass
             self.matcher.match_next()
-            self.try_execute()
 
-    def try_execute(self):
-        try:
-            super().execute()
-        except MatchException:
-            # do nothing
-            pass
+        if not self.result_is_a_bisimulation():
+            self._invalidate_current_relation()
 
-    def get_transitions_with_label_from(self, state, label):
+        self._minimize_current_relation()
+
+    def result(self):
+        return super().result(), self.matcher.serialize()
+
+    def _get_transitions_with_label_from(self, state, label):
         matched_label = self.matcher.match(label)
-        return super().get_transitions_with_label_from(state, matched_label)
+        return super()._get_transitions_with_label_from(state, matched_label)
+
+    def _clean_knowledge_with(self, label):
+        super()._clean_knowledge_with(label)
+        # TODO: ver si tengo que matchear
+        # self.current_knowledge = clean_knowledge_for(self.current_knowledge, label)
+
+    # _is_able_to_simulate_knowledge

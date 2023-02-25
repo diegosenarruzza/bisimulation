@@ -15,7 +15,7 @@ class Interaction:
         return self.message.is_carrying_something()
 
     def contains_any(self, variables):
-        return self.message.incldues(variables)
+        return self.message.includes(variables)
 
     class Message:
 

@@ -47,15 +47,18 @@ class AFSM:
         return set(
             map(
                 lambda transition: transition.assertion,
-                [transition for transitions in list(self.transitions_by_source_id.values()) for transition in transitions]
+                self._all_transitions()
             )
         )
+
+    def _all_transitions(self):
+        return [transition for transitions in self.transitions_by_source_id.values() for transition in transitions]
 
     def get_states(self):
         return set(self.states.values())
 
     # Se esta asumiendo que tanto "self", como "afsm" son validos, i.e. que cumplen con lo que cumple un cfsm que son los que estamos usando de base.
-    def build_bisimulation_with(self, afsm):
+    def calculate_bisimulation_with(self, afsm):
         strategy = self._bisimulation_strategy_with(afsm)
         strategy.execute()
         return strategy.result()

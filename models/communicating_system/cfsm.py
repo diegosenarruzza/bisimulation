@@ -1,14 +1,15 @@
 from models.afsm import AFSM
 from libs.tools import TrueAssertion
 from .interaction_parser import InteractionParser
+from .matchers.interaction_matcher import InteractionMatcher
 from models.stratified_bisimulation_strategies.non_shared_language_strategy import NonSharedLanguageBisimulationStrategy
 
 
 class CommunicatingFiniteStateMachine(AFSM):
 
-    def __init__(self, participants):
+    def __init__(self, *participants):
         # TODO: Verify are not repeated
-        self.participants = participants
+        self.participants = set(participants)
         super().__init__()
 
     def add_transition_between(self, source_id, target_id, interaction_string, assertion=TrueAssertion):
@@ -27,4 +28,11 @@ class CommunicatingFiniteStateMachine(AFSM):
         )
 
     def _bisimulation_strategy_with(self, cfsm):
-        return NonSharedLanguageBisimulationStrategy(self, cfsm)
+        # TODO: agregar matcher
+        return NonSharedLanguageBisimulationStrategy(self, cfsm, self._interaction_matcher())
+
+    def _interaction_matcher(self):
+        interactions = [transition.label for transition in self._all_transitions()]
+        participant_candidates = list(self.participants)
+        message_candidates = [transition.label.message for transition in self._all_transitions()]
+        return InteractionMatcher(interactions, participant_candidates, message_candidates)
