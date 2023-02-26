@@ -73,6 +73,14 @@ class MessageMatcher(Matcher):
     # def disable_symmetric_mode(self):
     #     self.match_manager.disable_symmetric_mode()
 
+    def decide_match(self, matched, candidate):
+        super().decide_match(matched, candidate)
+        self.variable_matcher.decide_match(matched, candidate)
+
+    def rollback_match(self, matched, candidate):
+        super().rollback_match(matched, candidate)
+        self.variable_matcher.rollback_match(matched, candidate)
+
     def serialize(self):
         return merge_dicts(
             {'messages': self.match_manager.serialize()},
