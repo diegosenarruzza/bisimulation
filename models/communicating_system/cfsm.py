@@ -23,23 +23,12 @@ class CommunicatingFiniteStateMachine(AFSM):
     def _parse_interaction(interaction_string):
         return InteractionParser().parse(interaction_string)
 
-    # def interactions(self):
-    #     return set(
-    #         transition for transitions in list(self.transitions_by_source_id.values()) for transition in transitions
-    #     )
-
     def _bisimulation_strategy_with(self, cfsm):
         return NonSharedLanguageBisimulationStrategy(
             self,
             cfsm,
             self._match_factory_with(cfsm).interaction_matcher()
         )
-
-    # def _interaction_matcher(self):
-    #     interactions = self.interactions()
-    #     participant_candidates = self.participants
-    #     message_candidates = self.messages()
-    #     return InteractionMatcher(interactions, participant_candidates, message_candidates)
 
     def interactions(self):
         return [transition.label for transition in self._all_transitions()]

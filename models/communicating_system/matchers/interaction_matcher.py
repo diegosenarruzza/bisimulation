@@ -1,8 +1,5 @@
 from libs.tools import merge_dicts
 from ..interaction import Interaction
-from .participant_matcher import ParticipantMatcher
-from .message_matcher import MessageMatcher
-from .decider import Decider
 
 
 class InteractionMatcher:
@@ -11,10 +8,6 @@ class InteractionMatcher:
         self.decider = decider
         self.participant_matcher = participant_matcher
         self.message_matcher = message_matcher
-        # self.match_manager = MatchManager()
-        # self.participant_matcher = ParticipantMatcher(self.decider, self.match_manager,  participant_candidates)
-        # self.message_matcher = MessageMatcher(self.decider, message_candidates, interactions, self.participant_matcher)
-        # self.symmetric_matches = False
 
     def match(self, interaction):
         sender, receiver = self.participant_matcher.match(interaction)
