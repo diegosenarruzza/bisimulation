@@ -24,4 +24,4 @@ class Symmetrical:
             return self.collection
 
     def copy(self):
-        return list(self.collection)
+        return list(self._current_collection())
