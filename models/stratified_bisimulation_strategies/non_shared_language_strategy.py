@@ -45,6 +45,14 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         matched_label = self.matcher.match(self.current_simulated_transition.label)
         return simulating_state.get_transitions_with(matched_label)
 
+    def _enable_symmetric_mode(self):
+        super()._enable_symmetric_mode()
+        self.matcher.disable_symmetric_mode()
+
+    def _disable_symmetric_mode(self):
+        super()._disable_symmetric_mode()
+        self.matcher.enable_symmetric_mode()
+
     #
     # def _clean_knowledge(self):
     #     super()._clean_knowledge()

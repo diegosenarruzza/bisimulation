@@ -13,10 +13,10 @@ class MatchManager:
         self.matches.remove(matched, matching)
 
     def has_matched(self, matched):
-        self.matches.includes(matched)
+        return self.matches.includes(matched)
 
     def get_match(self, matched):
-        self.matches.get(matched)
+        return self.matches.get(matched)
 
     def enable_symmetric_mode(self):
         self.matches.enable_symmetric_mode()

@@ -27,5 +27,5 @@ class MatchWithCandidatesManager(MatchManager):
     def has_candidates(self):
         return self.candidates.is_empty()
 
-    def candidates(self):
+    def candidates_copy(self):
         return self.candidates.copy()

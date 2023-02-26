@@ -8,21 +8,30 @@ class MatchManagerFactory:
     def __init__(self, cfsm_left, cfsm_right):
         self.cfsm_left = cfsm_left
         self.cfsm_right = cfsm_right
+        self.participant_match_manager = None
+        self.message_match_manager = None
+        self.variable_match_manager = None
 
     def participant_match(self):
-        return MatchWithCandidatesManager(
-            self.cfsm_left.participants,
-            self.cfsm_right.participants
-        )
+        if self.participant_match_manager is None:
+            self.participant_match_manager = MatchWithCandidatesManager(
+                self.cfsm_left.get_participants(),
+                self.cfsm_right.get_participants()
+            )
+        return self.participant_match_manager
 
     def message_match(self):
-        return MessageMatchManager(
-            self.cfsm_left.messages(),
-            self.cfsm_right.messages(),
-            self.cfsm_left.interactions(),
-            self.cfsm_right.interactions(),
-            self.participant_match()
-        )
+        if self.message_match_manager is None:
+            self.message_match_manager = MessageMatchManager(
+                self.cfsm_left.messages(),
+                self.cfsm_right.messages(),
+                self.cfsm_left.interactions(),
+                self.cfsm_right.interactions(),
+                self.participant_match()
+            )
+        return self.message_match_manager
 
     def variable_match(self):
-        return MatchManager()
+        if self.variable_match_manager is None:
+            self.variable_match_manager = MatchManager()
+        return self.variable_match_manager

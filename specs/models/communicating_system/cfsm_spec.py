@@ -19,9 +19,9 @@ class CFSMTestCase(unittest.TestCase):
         }
 
         expected_matches = {
-            'participant_matches': {'p1': 'p1', 'p2': 'p2'},
-            'message_matches': {str(f_x): f_x},
-            'variable_matches': {Int('x'): Int('x')}
+            'participant': {'p1': 'p1', 'p2': 'p2'},
+            'message': {str(f_x): f_x},
+            'variable': {Int('x'): Int('x')}
         }
 
         relation, matches = cfsm_example_1.calculate_bisimulation_with(cfsm_example_1)

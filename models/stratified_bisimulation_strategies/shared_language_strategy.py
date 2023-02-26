@@ -73,11 +73,17 @@ class SharedLanguageBisimulationStrategy:
 
                 # si simulated_state puede imitar a simulating_state y simulating_state puede imitar a simulated_state
                 # (cayendo siempre dentro de la current_relation) entonces tienen que estar en la siguiente aprox.
+                self._disable_symmetric_mode()
                 if self._is_able_to_simulate_falling_into(simulated_state, simulating_state):
-                    self.symmetric_mode = True
+                    self._enable_symmetric_mode()
                     if self._is_able_to_simulate_falling_into(simulating_state, simulated_state):
                         next_relation.append(relation_element)
-                    self.symmetric_mode = False
+
+    def _enable_symmetric_mode(self):
+        self.symmetric_mode = True
+
+    def _disable_symmetric_mode(self):
+        self.symmetric_mode = False
 
     def _is_able_to_simulate_falling_into(self, simulated_state, simulating_state):
         is_able = True
@@ -91,6 +97,11 @@ class SharedLanguageBisimulationStrategy:
 
             # Saco las assertions cuyas variables van a ser sobreescritas por la transicion actual
             self._clean_knowledge()
+
+            # necesito saber cual ese el label que le corresponde al de la derecha, a partir de el de la izquierda
+            # (si symmetric es False)
+            # Para buscar el label en el de la derecha, tengo que traducir de izquierda a dereceha (si es symmetric)
+            # y de derecha a izquierda (si es no symmetric)
 
             simulating_transitions = self._get_transitions_with_simulated_label_from(simulating_state)
 

@@ -5,8 +5,8 @@ class SymmetricalList(Symmetrical):
 
     def add(self, element, symmetric_element):
         current_collection, current_symmetric_collection = self._collections()
-        current_collection.add(element)
-        current_symmetric_collection.add(symmetric_element)
+        current_collection.append(element)
+        current_symmetric_collection.append(symmetric_element)
 
     def remove(self, element, symmetric_element):
         current_collection, current_symmetric_collection = self._collections()

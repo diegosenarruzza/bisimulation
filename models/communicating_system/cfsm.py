@@ -3,6 +3,7 @@ from libs.tools import TrueAssertion
 from .interaction_parser import InteractionParser
 from .matchers.interaction_matcher import InteractionMatcher
 from models.stratified_bisimulation_strategies.non_shared_language_strategy import NonSharedLanguageBisimulationStrategy
+from .factories.matcher_factory import MatcherFactory
 
 
 class CommunicatingFiniteStateMachine(AFSM):
@@ -22,17 +23,32 @@ class CommunicatingFiniteStateMachine(AFSM):
     def _parse_interaction(interaction_string):
         return InteractionParser().parse(interaction_string)
 
-    def interactions(self):
-        return set(
-            transition for transitions in list(self.transitions_by_source_id.values()) for transition in transitions
-        )
+    # def interactions(self):
+    #     return set(
+    #         transition for transitions in list(self.transitions_by_source_id.values()) for transition in transitions
+    #     )
 
     def _bisimulation_strategy_with(self, cfsm):
-        # TODO: agregar matcher
-        return NonSharedLanguageBisimulationStrategy(self, cfsm, self._interaction_matcher())
+        return NonSharedLanguageBisimulationStrategy(
+            self,
+            cfsm,
+            self._match_factory_with(cfsm).interaction_matcher()
+        )
 
-    def _interaction_matcher(self):
-        interactions = [transition.label for transition in self._all_transitions()]
-        participant_candidates = self.participants
-        message_candidates = [transition.label.message for transition in self._all_transitions()]
-        return InteractionMatcher(interactions, participant_candidates, message_candidates)
+    # def _interaction_matcher(self):
+    #     interactions = self.interactions()
+    #     participant_candidates = self.participants
+    #     message_candidates = self.messages()
+    #     return InteractionMatcher(interactions, participant_candidates, message_candidates)
+
+    def interactions(self):
+        return [transition.label for transition in self._all_transitions()]
+
+    def messages(self):
+        return [transition.label.message for transition in self._all_transitions()]
+
+    def get_participants(self):
+        return [participant for participant in self.participants]
+
+    def _match_factory_with(self, cfsm):
+        return MatcherFactory(self, cfsm)
