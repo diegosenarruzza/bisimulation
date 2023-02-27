@@ -15,6 +15,9 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         self._minimize_current_relation()
 
     def result(self):
+        if not self.result_is_a_bisimulation():
+            return set(), {}
+
         return self.match_current_relation(), self.matcher.serialize()
 
     def match_current_relation(self):
@@ -96,6 +99,7 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         transition_knowledge = And(matched_current_knowledge.union(matched_current_simulated_assertions))
         simulation_transition_knowledge = And(matched_current_knowledge.union({Or(matched_simulation_assertions)}))
 
+        # TOODL ver si es un solver o un prover
         solver = Solver()
 
         return solver.check(Implies(transition_knowledge, simulation_transition_knowledge)) == sat

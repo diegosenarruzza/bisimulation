@@ -4,6 +4,7 @@ from models.communicating_system.interaction import Interaction
 from models.assertion import Assertion
 from ...resources.cfsm.example_1 import cfsm as cfsm_example_1
 from ...resources.cfsm.example_2 import cfsm_1 as cfsm_example_2_1, cfsm_2 as cfsm_example_2_2
+from ...resources.cfsm.example_3 import cfsm_1 as cfsm_example_3_1, cfsm_2 as cfsm_example_3_2
 Message = Interaction.Message
 
 
@@ -53,6 +54,12 @@ class CFSMTestCase(unittest.TestCase):
 
         self.assertEqual(expected_relation, relation)
         self.assertEqual(expected_matches, matches)
+
+    def test_03_must_return_empty_relation_and_match_when_is_not_be_bisimilar_but_match(self):
+        relation, matches = cfsm_example_3_1.calculate_bisimulation_with(cfsm_example_3_2)
+
+        self.assertEqual(set(), relation)
+        self.assertEqual({}, matches)
 
 
 if __name__ == '__main__':
