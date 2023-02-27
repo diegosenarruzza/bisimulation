@@ -1,6 +1,7 @@
 import unittest
 from z3 import Int, BoolVal
 from models.communicating_system.interaction import Interaction
+from models.assertion import Assertion
 from ...resources.cfsm.example_1 import cfsm as cfsm_example_1
 from ...resources.cfsm.example_2 import cfsm_1 as cfsm_example_2_1, cfsm_2 as cfsm_example_2_2
 Message = Interaction.Message
@@ -15,7 +16,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = {
             (q0, frozenset(), q0),
-            (q1, frozenset({Int('x') > 0}), q1),
+            (q1, frozenset({Assertion(Int('x') > 0, cfsm_example_1)}), q1),
         }
 
         expected_matches = {
@@ -40,12 +41,12 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = {
             (p0, frozenset(), q0),
-            (p1, frozenset({Int('x') > 0}), q1)
+            (p1, frozenset({Assertion(Int('x') > 0, cfsm_example_2_1)}), q1)
         }
         expected_matches = {
-            'participants_matches': {'client': 'consumer', 'shop': 'producer'},
-            'messages_matches': {str(add_to_cart_message): add_message},
-            'variable_matches': {Int('number'): Int('x')}
+            'participants': {'client': 'consumer', 'shop': 'producer'},
+            'messages': {str(add_to_cart_message): add_message},
+            'variable': {Int('number'): Int('x')}
         }
 
         relation, matches = cfsm_example_2_1.calculate_bisimulation_with(cfsm_example_2_2)

@@ -38,3 +38,11 @@ class MessageMatcher(Matcher):
             {'messages': self.match_manager.serialize()},
             self.variable_matcher.serialize()
         )
+
+    def enable_symmetric_mode(self):
+        super().enable_symmetric_mode()
+        self.variable_matcher.enable_symmetric_mode()
+
+    def disable_symmetric_mode(self):
+        super().disable_symmetric_mode()
+        self.variable_matcher.disable_symmetric_mode()

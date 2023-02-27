@@ -159,13 +159,9 @@ class SharedLanguageBisimulationStrategy:
         while (not valid_transitions_set_exists) and j < len(simulating_transitions_subsets):
             simulating_transitions_subset = list(simulating_transitions_subsets[j])
 
-            simulate = self._is_able_to_simulate_knowledge(simulating_transitions_subset)
-            fall_into = self._transitions_subset_fall_into_relation(simulating_transitions_subset)
-
             # si encontre un sub-conjunto de transiciones, cuya implicacion es satisfacible y ademas cae dentro de la aproximacion, entonces es valido
-            valid_transitions_set_exists = simulate and fall_into
-            # valid_transitions_set_exists = self._is_able_to_simulate_knowledge(simulating_transitions_subset) and \
-            #                                self._transitions_subset_fall_into_relation(simulating_transitions_subset)
+            valid_transitions_set_exists = self._transitions_subset_fall_into_relation(simulating_transitions_subset) and \
+                                           self._is_able_to_simulate_knowledge(simulating_transitions_subset)
 
             j += 1
 
