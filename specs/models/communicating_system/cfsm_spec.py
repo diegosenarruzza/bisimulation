@@ -16,7 +16,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = {
             (q0, frozenset(), q0),
-            (q1, frozenset({Assertion(Int('x') > 0, cfsm_example_1)}), q1),
+            (q1, frozenset({Int('x') > 0}), q1),
         }
 
         expected_matches = {
@@ -41,12 +41,12 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = {
             (p0, frozenset(), q0),
-            (p1, frozenset({Assertion(Int('x') > 0, cfsm_example_2_1)}), q1)
+            (p1, frozenset({Int('number') > 0}), q1)
         }
         expected_matches = {
             'participants': {'client': 'consumer', 'shop': 'producer'},
             'messages': {str(add_to_cart_message): add_message},
-            'variable': {Int('number'): Int('x')}
+            'variables': {'number': Int('x')}
         }
 
         relation, matches = cfsm_example_2_1.calculate_bisimulation_with(cfsm_example_2_2)

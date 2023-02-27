@@ -15,7 +15,15 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         self._minimize_current_relation()
 
     def result(self):
-        return super().result(), self.matcher.serialize()
+        return self.match_current_relation(), self.matcher.serialize()
+
+    def match_current_relation(self):
+        matched_relation = set()
+        for simulated_state, knowledge, simulating_state in self.current_relation:
+            matched_knowledge = self._match_expressions_set_from(knowledge)
+            matched_relation.add((simulated_state, frozenset(matched_knowledge), simulating_state))
+
+        return matched_relation
 
     def _try_calculate_bisimulation_relation(self):
         self._set_initial_relation_as_current()
@@ -87,9 +95,6 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
 
         transition_knowledge = And(matched_current_knowledge.union(matched_current_simulated_assertions))
         simulation_transition_knowledge = And(matched_current_knowledge.union({Or(matched_simulation_assertions)}))
-
-        # transition_knowledge = And(self.current_knowledge.union({self.current_simulated_transition.assertion}))
-        # simulation_transition_knowledge = And(self.current_knowledge.union({Or(simulation_assertions)}))
 
         solver = Solver()
 
