@@ -1,8 +1,14 @@
+from libs.z3_renamer import rename_variables
+from models.assertion import Assertion
 from .matcher import Matcher
 
 
 # VariableMatcher no toma decisiones, solo guarda las variables decididas por el message matcher
 class VariableMatcher(Matcher):
+
+    def match_assertion(self, assertion):
+        renamed_expression = rename_variables(assertion.expression, self._string_matches())
+        return Assertion(renamed_expression, assertion.graph)
 
     def decide_match(self, matched_message, candidate_message):
         for matched_variable, candidate_variable in zip(matched_message.payload, candidate_message.payload):
@@ -18,3 +24,10 @@ class VariableMatcher(Matcher):
         return {
             'variables': self.match_manager.serialize()
         }
+
+    def _string_matches(self):
+        string_matches = {}
+        for matched, matching in self.match_manager.copy().items():
+            string_matches[matched] = str(matching)
+
+        return string_matches

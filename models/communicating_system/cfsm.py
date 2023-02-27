@@ -1,7 +1,6 @@
 from models.afsm import AFSM
-from libs.tools import TrueAssertion
+from libs.tools import TrueFormula
 from .interaction_parser import InteractionParser
-from .matchers.interaction_matcher import InteractionMatcher
 from models.stratified_bisimulation_strategies.non_shared_language_strategy import NonSharedLanguageBisimulationStrategy
 from .factories.matcher_factory import MatcherFactory
 
@@ -13,11 +12,11 @@ class CommunicatingFiniteStateMachine(AFSM):
         self.participants = participants
         super().__init__()
 
-    def add_transition_between(self, source_id, target_id, interaction_string, assertion=TrueAssertion):
+    def add_transition_between(self, source_id, target_id, interaction_string, formula=TrueFormula):
         interaction = self._parse_interaction(interaction_string)
         # validate interaction participants are in participant_ids
 
-        super().add_transition_between(source_id, target_id, interaction, assertion)
+        super().add_transition_between(source_id, target_id, interaction, formula)
 
     @staticmethod
     def _parse_interaction(interaction_string):
@@ -41,3 +40,10 @@ class CommunicatingFiniteStateMachine(AFSM):
 
     def _match_factory_with(self, cfsm):
         return MatcherFactory(self, cfsm)
+
+    def interactions_that_define(self, variables):
+        interactions = []
+        for interaction in self.interactions():
+            if interaction.contains_any(variables):
+                interactions.append(interaction)
+        return interactions

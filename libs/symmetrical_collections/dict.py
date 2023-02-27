@@ -18,3 +18,6 @@ class SymmetricalDict(Symmetrical):
 
     def includes(self, element):
         return str(element) in self._current_collection()
+
+    def copy(self):
+        return self._current_collection().copy()

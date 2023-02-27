@@ -1,7 +1,8 @@
 from models.state import State
 from models.transition import Transition
-from libs.tools import TrueAssertion
+from libs.tools import TrueFormula
 from .stratified_bisimulation_strategies.shared_language_strategy import SharedLanguageBisimulationStrategy
+from models.assertion import Assertion
 
 
 class AFSM:
@@ -25,12 +26,14 @@ class AFSM:
         self.initial_state = self.states[state_id]
 
     # assertion must be a z3 assertion
-    def add_transition_between(self, source_id, target_id, label, assertion=TrueAssertion):
+    def add_transition_between(self, source_id, target_id, label, formula=TrueFormula):
         # validate present
         # validate transition not exist
 
         source = self.states[source_id]
         target = self.states[target_id]
+
+        assertion = Assertion(formula, self)
 
         transition = Transition(source, target, label, assertion)
 

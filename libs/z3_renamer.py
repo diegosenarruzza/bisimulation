@@ -59,5 +59,4 @@ def rename_comparison(comparison, renames):
 
 
 def rename_variable(variable, renames):
-    name = variable.decl().name()
-    return renames[name]
+    return renames[str(variable)]

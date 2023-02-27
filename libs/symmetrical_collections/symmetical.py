@@ -22,6 +22,3 @@ class Symmetrical:
             return self.symmetric_collection
         else:
             return self.collection
-
-    def copy(self):
-        return list(self._current_collection())

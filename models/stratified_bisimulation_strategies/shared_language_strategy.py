@@ -15,7 +15,7 @@ class SharedLanguageBisimulationStrategy:
 
     def execute(self):
         self._set_initial_relation_as_current()
-        self._calculate_bisimulation_relation()
+        self._calculate_bisimulation_from_current_relation()
 
         # La relacion puede no ser una bisimulacion porque: no tiene elementos o, no esta el elemento inicial
         # Invalido la relacion (seteo []) para contemplar el segundo caso
@@ -37,6 +37,22 @@ class SharedLanguageBisimulationStrategy:
     def _set_initial_relation_as_current(self):
         self.current_relation = self._initial_relation()
 
+    # TODO: para mejorar esto, cada estado deberia saber cuales son sus posibles "conocimientos"
+    # En la definicion de bisimulacion va armando un camino a partir de dos estados, y tomando como
+    # conocimiento a la conjuncion de ambos (i.e. guardandolos en un conjunto)
+    # Lo que busco con este algoritmo (al mezclarlo todo) es en realidad, cual es el conocimiento (o los) que comparten
+    # entre ambos estados.
+    # Entonces lo que puedo hacer eso, para cada estado:
+    #   - calcular cuales son sus posibles conocimiento (acumular assertions desde el estado inicial hasta llegar a ese)
+    #     si el estado no esta en un loop, entonces solo va a haber uno
+    #   - Para cada par de estados de uno y otro automata:
+    #       - Mezclar todas las combinaciones de conocimientos como candidatos en la relacion inicial
+    #       - si p.knowledges() = { kp1, kp2, .., kpn }, q.knowledges() = { kq1, kq2, ..., kqm }
+    #       - candidates_for(p, q) = [
+    #       (p, kp1.union(kq1), q), (p, kp1.union(kq2), q), ..., (p, kp1.union(kqm), ...
+    #       ....
+    #       (p, kpn.union(kq1), q), (p, kpn.union(kq2), q), ..., (p, kpn.union(kqm) ]
+    # Para la estrategia que matchea, por ahi conviene dejarlos separados, para el matcheo de variables del paso final.
     def _initial_relation(self):
         assertions = self.afsm_left.all_assertions().union(self.afsm_right.all_assertions())
         all_possible_knowledge = [frozenset(knowledge) for knowledge in powerset(assertions)]
@@ -48,7 +64,7 @@ class SharedLanguageBisimulationStrategy:
             removed_element = self.current_relation.pop(0)
             smallest_relation = self.current_relation
 
-            self._calculate_bisimulation_relation()
+            self._calculate_bisimulation_from_current_relation()
 
             # Si la nueva relacion es vacia, entonces el elemento que saque era necesario
             if not self.result_is_a_bisimulation():
@@ -59,7 +75,8 @@ class SharedLanguageBisimulationStrategy:
     def _invalidate_current_relation(self):
         self.current_relation = []
 
-    def _calculate_bisimulation_relation(self):
+    def _calculate_bisimulation_from_current_relation(self):
+        # Detalle por el hecho de que tiene que ser un do-while
         next_relation = self.current_relation
         self.current_relation = []
 
@@ -67,23 +84,29 @@ class SharedLanguageBisimulationStrategy:
             self.current_relation = next_relation
             next_relation = []
 
-            for relation_element in self.current_relation:
-                simulated_state, knowledge, simulating_state = relation_element
-                self.current_knowledge = set(knowledge)
-
-                # si simulated_state puede imitar a simulating_state y simulating_state puede imitar a simulated_state
-                # (cayendo siempre dentro de la current_relation) entonces tienen que estar en la siguiente aprox.
-                self._disable_symmetric_mode()
-                if self._is_able_to_simulate_falling_into(simulated_state, simulating_state):
-                    self._enable_symmetric_mode()
-                    if self._is_able_to_simulate_falling_into(simulating_state, simulated_state):
-                        next_relation.append(relation_element)
+            for related_element in self.current_relation:
+                self._calculate_bisimulation_for(related_element, next_relation)
 
     def _enable_symmetric_mode(self):
         self.symmetric_mode = True
 
     def _disable_symmetric_mode(self):
         self.symmetric_mode = False
+
+    def _calculate_bisimulation_for(self, candidate_element, next_relation):
+        simulated_state, knowledge, simulating_state = candidate_element
+        self._set_current_knowledge(knowledge)
+        # self.current_knowledge = set(knowledge)
+
+        # Se tienen que poder simular mutuamente
+        self._disable_symmetric_mode()
+        if self._is_able_to_simulate_falling_into(simulated_state, simulating_state):
+            self._enable_symmetric_mode()
+            if self._is_able_to_simulate_falling_into(simulating_state, simulated_state):
+                next_relation.append(candidate_element)
+
+    def _set_current_knowledge(self, knowledge):
+        self.current_knowledge = set(knowledge)
 
     def _is_able_to_simulate_falling_into(self, simulated_state, simulating_state):
         is_able = True
@@ -93,7 +116,7 @@ class SharedLanguageBisimulationStrategy:
         # Si corta porque no cumple is_able, entonces es porque existe una accion que "simulating_state" no puede simular, o que puede pero no cae en la relacion
         # Si corta porque i < len(transitions) entonces recorrio todas las acciones y "simulating_state" siempre pudo simular a e y caer dentro de la relacion
         while is_able and i < len(simulated_transitions):
-            self.current_simulated_transition = simulated_transitions[i]
+            self._set_current_simulated_transition(simulated_transitions[i])
 
             # Saco las assertions cuyas variables van a ser sobreescritas por la transicion actual
             self._clean_knowledge()
@@ -115,6 +138,9 @@ class SharedLanguageBisimulationStrategy:
 
         return is_able
 
+    def _set_current_simulated_transition(self, simulated_transition):
+        self.current_simulated_transition = simulated_transition
+
     def _clean_knowledge(self):
         if self.current_simulated_transition.label.has_variable():
             self.current_knowledge = clean_knowledge_for(self.current_knowledge, self.current_simulated_transition.label)
@@ -133,9 +159,13 @@ class SharedLanguageBisimulationStrategy:
         while (not valid_transitions_set_exists) and j < len(simulating_transitions_subsets):
             simulating_transitions_subset = list(simulating_transitions_subsets[j])
 
+            simulate = self._is_able_to_simulate_knowledge(simulating_transitions_subset)
+            fall_into = self._transitions_subset_fall_into_relation(simulating_transitions_subset)
+
             # si encontre un sub-conjunto de transiciones, cuya implicacion es satisfacible y ademas cae dentro de la aproximacion, entonces es valido
-            valid_transitions_set_exists = self._is_able_to_simulate_knowledge(simulating_transitions_subset) and \
-                                           self._transitions_subset_fall_into_relation(simulating_transitions_subset)
+            valid_transitions_set_exists = simulate and fall_into
+            # valid_transitions_set_exists = self._is_able_to_simulate_knowledge(simulating_transitions_subset) and \
+            #                                self._transitions_subset_fall_into_relation(simulating_transitions_subset)
 
             j += 1
 

@@ -18,6 +18,9 @@ class InteractionMatcher:
     def match_next(self):
         self.decider.take_next_decision()
 
+    def match_assertion(self, assertion):
+        return self.message_matcher.variable_matcher.match_assertion(assertion)
+
     def has_more_possible_matches(self):
         return self.decider.there_are_decisions_to_take()
 

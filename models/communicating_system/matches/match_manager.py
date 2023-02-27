@@ -26,3 +26,6 @@ class MatchManager:
 
     def serialize(self):
         return self.matches.collection
+
+    def copy(self):
+        return self.matches.copy()

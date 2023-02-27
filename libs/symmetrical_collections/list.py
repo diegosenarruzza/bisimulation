@@ -21,3 +21,6 @@ class SymmetricalList(Symmetrical):
 
     def filter(self, condition):
         return [element for element in self._current_collection() if condition(condition)]
+
+    def copy(self):
+        return list(self._current_collection())
