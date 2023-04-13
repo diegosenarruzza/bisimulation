@@ -1,9 +1,5 @@
 from libs.tools import powerset
-from itertools import product, chain, combinations
-from z3 import BoolVal, Solver, sat
-from .knowledge import Knowledge
-from ..assertion import Assertion
-TrueAssertion = Assertion(BoolVal(True))
+from itertools import product
 
 
 class InitialRelationCalculation:
@@ -23,25 +19,3 @@ class InitialRelationCalculation:
         right_candidates = list(product(self.afsm_right.get_states(), powerset(self.afsm_right.all_assertions())))
 
         return list(product(left_candidates, right_candidates))
-
-    # def calculate(self):
-    #     # TODO: podria filtrar los candidatos en donde el conocimiento no se contradiga
-    #
-    #     left_knowledges = self.knowledges_for(self.afsm_left)
-    #     right_knowledges = self.knowledges_for(self.afsm_right)
-    #
-    #     left_candidates = list(product(self.afsm_left.get_states(), left_knowledges))
-    #     right_candidates = list(product(self.afsm_right.get_states(), right_knowledges))
-    #
-    #     return list(product(left_candidates, right_candidates))
-    #
-    # def knowledges_for(self, afsm):
-    #     assertions = afsm.all_assertions()
-    #     if TrueAssertion in assertions:
-    #         assertions.remove(TrueAssertion)
-    #
-    #     assertions_powerset = list(map(lambda t: Knowledge(frozenset(t)), chain.from_iterable(combinations(assertions, r) for r in range(len(assertions)+1))))
-    #
-    #     solver = Solver()
-    #
-    #     return list(map(lambda k: k.assertions_set, filter(lambda knowledge: solver.check(knowledge.build_conjunction()) == sat, assertions_powerset)))

@@ -61,9 +61,9 @@ class AFSM:
         return set(self.states.values())
 
     # Se esta asumiendo que tanto "self", como "afsm" son validos, i.e. que cumplen con lo que cumple un cfsm que son los que estamos usando de base.
-    def calculate_bisimulation_with(self, afsm):
+    def calculate_bisimulation_with(self, afsm, minimize=False):
         strategy = self._bisimulation_strategy_with(afsm)
-        strategy.execute()
+        strategy.execute(minimize)
         return strategy.result()
 
     # TODO: esto no se si va a funcionar bien

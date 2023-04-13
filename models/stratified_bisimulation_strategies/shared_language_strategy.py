@@ -13,16 +13,17 @@ class SharedLanguageBisimulationStrategy:
         self.symmetric_mode = False
         self.current_relation = None
 
-    def execute(self):
+    def execute(self, minimize):
         self._set_initial_relation_as_current()
         self._calculate_bisimulation_from_current_relation()
 
-        # La relacion puede no ser una bisimulacion si: no tiene elementos o, no esta el elemento inicial
-        # Invalido la relacion (seteo []) para contemplar el segundo caso
+        # La relacion no es una bisimulacion si: no tiene elementos o, no esta el elemento inicial
+        # Se invalida en tal caso
         if not self.result_is_a_bisimulation():
             self._invalidate_current_relation()
 
-        self._minimize_current_relation()
+        if minimize:
+            self._minimize_current_relation()
 
     def result(self):
         return set(self.current_relation)
