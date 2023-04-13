@@ -4,10 +4,11 @@ from z3 import BoolVal
 TrueFormula = BoolVal(True)
 
 
-def powerset(iterable):
-    """powerset([1,2,3]) --> () (1,) (2,) (3,) (1,2) (1,3) (2,3) (1,2,3)"""
-    s = list(iterable)
-    return chain.from_iterable(combinations(s, r) for r in range(len(s) + 1))
+def powerset(s):
+    # s = {1, 2, 3}
+    # powerset(s) = [set(), {1}, {2}, {3}, {1, 2}, {1, 3}, {2, 3}, {1, 2, 3}]
+
+    return list(map(frozenset, chain.from_iterable(combinations(s, r) for r in range(len(s)+1))))
 
 
 def collect_variables(assertion):

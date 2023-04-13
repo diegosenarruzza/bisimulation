@@ -4,8 +4,14 @@ from specs.resources.afsm.afsm_example_2_1 import afsm_example_2_1
 from specs.resources.afsm.afsm_example_2_2 import afsm_example_2_2
 from specs.resources.afsm.afsm_example_3_1 import afsm_example_3_1
 from specs.resources.afsm.afsm_example_3_2 import afsm_example_3_2
+from models.assertion import Assertion
 from z3 import Int, BoolVal
+
 TrueAssertion = BoolVal(True)
+x_grater_than_zero = Assertion(Int('x') > 0)
+x_lower_than_zero = Assertion(Int('x') < 0)
+x_neq_zero = Assertion(Int('x') != 0)
+y_grater_than_x = Assertion(Int('y') > Int('x'))
 
 
 class AFSMCase(unittest.TestCase):
@@ -15,9 +21,9 @@ class AFSMCase(unittest.TestCase):
         p1 = afsm_example_1.states['p1']
 
         expected_relation = {
-            (p0, frozenset(), p0),
-            (p1, frozenset({Int('x') > 0}), p1),
-            (p0, frozenset({Int('x') > 0, Int('y') > Int('x')}), p0)
+            ((p0, frozenset()), (p0, frozenset())),
+            ((p1, frozenset({x_grater_than_zero})), (p1, frozenset({x_grater_than_zero}))),
+            ((p0, frozenset({x_grater_than_zero, y_grater_than_x})), (p0, frozenset({x_grater_than_zero, y_grater_than_x})))
         }
         relation = afsm_example_1.calculate_bisimulation_with(afsm_example_1)
         self.assertEqual(expected_relation, relation)
@@ -28,12 +34,10 @@ class AFSMCase(unittest.TestCase):
         q0 = afsm_example_2_2.states['q0']
         q1 = afsm_example_2_2.states['q1']
 
-        x = Int('x')
-
         expected_relation = {
-            (p0, frozenset(), q0),
-            (p1, frozenset({x != 0, x > 0}), q1),
-            (p1, frozenset({x != 0, x < 0}), q1)
+            ((p0, frozenset()), (q0, frozenset())),
+            ((p1, frozenset({x_neq_zero})), (q1, frozenset({x_grater_than_zero}))),
+            ((p1, frozenset({x_neq_zero})), (q1, frozenset({x_lower_than_zero})))
         }
         relation = afsm_example_2_1.calculate_bisimulation_with(afsm_example_2_2)
         self.assertEqual(expected_relation, relation)
@@ -49,16 +53,15 @@ class AFSMCase(unittest.TestCase):
         q3 = afsm_example_3_2.states['q3']
         q4 = afsm_example_3_2.states['q4']
 
-        x = Int('x')
-
         expected_relation = {
-            (p0, frozenset(), q0),
-            (p1, frozenset({x != 0}), q1),
-            (p2, frozenset({x != 0, x > 0, TrueAssertion}), q2),
-            (p3, frozenset({x != 0, x > 0, TrueAssertion}), q4),
-            (p2, frozenset({x != 0, x < 0, TrueAssertion}), q3),
-            (p3, frozenset({x != 0, x < 0, TrueAssertion}), q4),
+            ((p0, frozenset()), (q0, frozenset())),
+            ((p1, frozenset({x_neq_zero})), (q1, frozenset({x_neq_zero}))),
+            ((p2, frozenset({x_neq_zero, TrueAssertion})), (q2, frozenset({x_grater_than_zero}))),
+            ((p3, frozenset({x_neq_zero, TrueAssertion})), (q4, frozenset({x_grater_than_zero, TrueAssertion}))),
+            ((p2, frozenset({x_neq_zero, TrueAssertion})), (q3, frozenset({x_lower_than_zero}))),
+            ((p3, frozenset({x_neq_zero, TrueAssertion})), (q4, frozenset({x_lower_than_zero, TrueAssertion})))
         }
+
         relation = afsm_example_3_1.calculate_bisimulation_with(afsm_example_3_2)
         self.assertEqual(expected_relation, relation)
 
