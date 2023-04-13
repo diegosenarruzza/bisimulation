@@ -4,7 +4,7 @@ from specs.resources.afsm.afsm_example_2_1 import afsm_example_2_1
 from specs.resources.afsm.afsm_example_2_2 import afsm_example_2_2
 from specs.resources.afsm.afsm_example_3_1 import afsm_example_3_1
 from specs.resources.afsm.afsm_example_3_2 import afsm_example_3_2
-from models.assertion import Assertion
+from models.assertable_finite_state_machines.assertion import Assertion
 from z3 import Int, BoolVal
 
 true = Assertion(BoolVal(True))

@@ -1,7 +1,6 @@
 import unittest
-from z3 import Int, BoolVal
+from z3 import Int
 from models.communicating_system.interaction import Interaction
-from models.assertion import Assertion
 from ...resources.cfsm.example_1 import cfsm as cfsm_example_1
 from ...resources.cfsm.example_2 import cfsm_1 as cfsm_example_2_1, cfsm_2 as cfsm_example_2_2
 from ...resources.cfsm.example_3 import cfsm_1 as cfsm_example_3_1, cfsm_2 as cfsm_example_3_2

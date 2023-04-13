@@ -1,6 +1,6 @@
 from z3 import Solver, unsat, Or, Not
 from libs.tools import powerset
-from ..assertion import Assertion
+from models.assertable_finite_state_machines.assertion import Assertion
 from .knowledge import Knowledge
 from .initial_relation_calculation import InitialRelationCalculation
 

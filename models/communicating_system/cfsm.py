@@ -1,4 +1,4 @@
-from models.afsm import AFSM
+from models.assertable_finite_state_machines.afsm import AFSM
 from libs.tools import TrueFormula
 from .interaction_parser import InteractionParser
 from models.stratified_bisimulation_strategies.non_shared_language_strategy import NonSharedLanguageBisimulationStrategy

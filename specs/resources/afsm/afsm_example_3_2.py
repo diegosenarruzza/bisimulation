@@ -1,5 +1,5 @@
-from models.afsm import AFSM
-from models.assertable_label import AssertableLabel
+from models.assertable_finite_state_machines.afsm import AFSM
+from models.assertable_finite_state_machines.assertable_label import AssertableLabel
 from z3 import Int
 
 afsm_example_3_2 = AFSM()
