@@ -66,6 +66,5 @@ class AFSM:
         strategy.execute(minimize)
         return strategy.result()
 
-    # TODO: esto no se si va a funcionar bien
     def _bisimulation_strategy_with(self, afsm):
         return SharedLanguageBisimulationStrategy(self, afsm)
