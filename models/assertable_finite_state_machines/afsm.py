@@ -1,7 +1,7 @@
 from models.assertable_finite_state_machines.state import State
 from models.assertable_finite_state_machines.transition import Transition
 from libs.tools import TrueFormula
-from models.stratified_bisimulation_strategies.shared_language_strategy import SharedLanguageBisimulationStrategy
+from models.stratified_bisimulation_strategies.shared_language_strategy.bisimulation import SharedLanguageBisimulationStrategy
 from models.assertable_finite_state_machines.assertion import Assertion
 
 

@@ -1,7 +1,7 @@
 from models.assertable_finite_state_machines.afsm import AFSM
 from libs.tools import TrueFormula
 from .interaction_parser import InteractionParser
-from models.stratified_bisimulation_strategies.non_shared_language_strategy import NonSharedLanguageBisimulationStrategy
+from models.stratified_bisimulation_strategies.non_shared_language_strategy.bisimulation import NonSharedLanguageBisimulationStrategy
 from .factories.matcher_factory import MatcherFactory
 
 

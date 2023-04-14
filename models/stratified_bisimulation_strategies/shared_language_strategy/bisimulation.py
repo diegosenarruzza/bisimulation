@@ -1,5 +1,5 @@
-from .simulation import Simulation
-from .initial_relation_calculation import InitialRelationCalculation
+from .simulation import SharedLanguageSimulationStrategy
+from ..initial_relation_calculation import InitialRelationCalculation
 
 
 class SharedLanguageBisimulationStrategy:
@@ -70,23 +70,23 @@ class SharedLanguageBisimulationStrategy:
                     next_relation.append(candidate_element)
 
     def _is_a_bisimulation(self, candidate_element):
-        self.disable_symmetric_mode_with(candidate_element)
+        self._disable_symmetric_mode_with(candidate_element)
 
         if self.current_simulation.is_able_to_simulate():
-            self.enable_symmetric_mode_with(candidate_element)
+            self._enable_symmetric_mode_with(candidate_element)
 
             if self.current_simulation.is_able_to_simulate():
                 return True
 
         return False
 
-    def enable_symmetric_mode_with(self, candidate_element):
+    def _enable_symmetric_mode_with(self, candidate_element):
         self.symmetric_mode = True
-        self.current_simulation = Simulation(self, tuple(reversed(candidate_element)))
+        self.current_simulation = SharedLanguageSimulationStrategy(self, tuple(reversed(candidate_element)))
 
-    def disable_symmetric_mode_with(self, candidate_element):
+    def _disable_symmetric_mode_with(self, candidate_element):
         self.symmetric_mode = False
-        self.current_simulation = Simulation(self, candidate_element)
+        self.current_simulation = SharedLanguageSimulationStrategy(self, candidate_element)
 
     def includes(self, element):
         if self.symmetric_mode:

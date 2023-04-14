@@ -1,10 +1,10 @@
-from libs.tools import powerset
-from .knowledge import Knowledge
-from ..assertable_finite_state_machines.assertion import Assertion
 from z3 import Or, Not, Solver, unsat
+from libs.tools import powerset
+from models.assertable_finite_state_machines.assertion import Assertion
+from ..knowledge import Knowledge
 
 
-class Simulation:
+class SharedLanguageSimulationStrategy:
 
     def __init__(self, bisimulation, candidate_element_tuple):
         self.bisimulation = bisimulation
