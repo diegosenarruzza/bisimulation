@@ -8,7 +8,7 @@ class VariableMatcher(Matcher):
 
     def match_assertion(self, assertion):
         renamed_expression = rename_variables(assertion.expression, self._string_matches())
-        return Assertion(renamed_expression, assertion.graph)
+        return Assertion(renamed_expression)
 
     def decide_match(self, matched_message, candidate_message):
         for matched_variable, candidate_variable in zip(matched_message.payload, candidate_message.payload):
