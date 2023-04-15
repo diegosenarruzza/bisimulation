@@ -29,7 +29,7 @@ class CFSMTestCase(unittest.TestCase):
             (_(q1, x_grater_than_zero), _(q1, x_grater_than_zero)),
         }
         expected_matches = {
-            'participants': {'p1': 'p1', 'p2': 'p2'},
+            'participants': {'customer': 'customer', 'service': 'service'},
             'messages': {str(f_x): f_x},
             'variables': {'x': x}
         }
@@ -45,17 +45,17 @@ class CFSMTestCase(unittest.TestCase):
         q0 = cfsm_example_2_2.states['q0']
         q1 = cfsm_example_2_2.states['q1']
 
-        add_message = Message('add', payload=[Int('x')])
+        add_message = Message('add', payload=[x])
         add_to_cart_message = Message('add_to_cart', payload=[Int('number')])
 
         expected_relation = {
-            (p0, frozenset(), q0),
-            (p1, frozenset({Int('number') > 0}), q1)
+            (_(p0), _(q0)),
+            (_(p1, Int('number') > 0), _(q1, Int('x') > 0))
         }
         expected_matches = {
             'participants': {'client': 'consumer', 'shop': 'producer'},
             'messages': {str(add_to_cart_message): add_message},
-            'variables': {'number': Int('x')}
+            'variables': {'number': x}
         }
 
         relation, matches = cfsm_example_2_1.calculate_bisimulation_with(cfsm_example_2_2)
