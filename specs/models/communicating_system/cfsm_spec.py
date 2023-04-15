@@ -7,10 +7,10 @@ from models.communicating_system.interaction import Interaction
 from models.assertable_finite_state_machines.assertion import Assertion
 Message = Interaction.Message
 x = Int('x')
-x_grater_than_zero = Assertion(x > 0)
+number = Int('number')
 
-
-def _(state, *assertions):
+def _(state, *expressions):
+    assertions = list(map(Assertion, expressions))
     return state, frozenset(assertions)
 
 
@@ -26,7 +26,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = {
             (_(q0), _(q0)),
-            (_(q1, x_grater_than_zero), _(q1, x_grater_than_zero)),
+            (_(q1, x > 0), _(q1, x > 0)),
         }
         expected_matches = {
             'participants': {'customer': 'customer', 'service': 'service'},
@@ -46,19 +46,19 @@ class CFSMTestCase(unittest.TestCase):
         q1 = cfsm_example_2_2.states['q1']
 
         add_message = Message('add', payload=[x])
-        add_to_cart_message = Message('add_to_cart', payload=[Int('number')])
+        add_to_cart_message = Message('add_to_cart', payload=[number])
 
         expected_relation = {
             (_(p0), _(q0)),
-            (_(p1, Int('number') > 0), _(q1, Int('x') > 0))
+            (_(p1, x > 0), _(q1, number > 0))
         }
         expected_matches = {
-            'participants': {'client': 'consumer', 'shop': 'producer'},
-            'messages': {str(add_to_cart_message): add_message},
-            'variables': {'number': x}
+            'participants': {'consumer': 'client', 'producer': 'shop'},
+            'messages': {str(add_message): add_to_cart_message},
+            'variables': {'x': number}
         }
 
-        relation, matches = cfsm_example_2_1.calculate_bisimulation_with(cfsm_example_2_2)
+        relation, matches = cfsm_example_2_1.calculate_bisimulation_with(cfsm_example_2_2, minimize=True)
 
         self.assertEqual(expected_relation, relation)
         self.assertEqual(expected_matches, matches)

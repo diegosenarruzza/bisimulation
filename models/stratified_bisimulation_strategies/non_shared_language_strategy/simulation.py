@@ -51,7 +51,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         matched_knowledge = Knowledge(frozenset())
 
         for assertion in knowledge.assertions_set:
-            matched_knowledge.add(
+            matched_knowledge = matched_knowledge.add(
                 self.bisimulation.matcher.match_assertion(assertion)
             )
         return matched_knowledge
