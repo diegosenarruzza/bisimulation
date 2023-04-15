@@ -1,7 +1,5 @@
 from z3 import Solver, Not, unsat
-
 from libs.tools import powerset
-from ...assertable_finite_state_machines.assertion import Assertion
 from ..shared_language_strategy.simulation import SharedLanguageSimulationStrategy
 from ..knowledge import Knowledge
 
@@ -9,6 +7,7 @@ from ..knowledge import Knowledge
 #   - El label de la simulated transition
 #   - La assertion de la simulated transition
 #   - El simulated knowledge
+
 
 class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
 

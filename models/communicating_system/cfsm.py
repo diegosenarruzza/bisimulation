@@ -26,7 +26,7 @@ class CommunicatingFiniteStateMachine(AFSM):
         return NonSharedLanguageBisimulationStrategy(
             self,
             cfsm,
-            self._match_factory_with(cfsm).interaction_matcher()
+            self._matcher_factory_with(cfsm).interaction_matcher()
         )
 
     def interactions(self):
@@ -38,7 +38,7 @@ class CommunicatingFiniteStateMachine(AFSM):
     def get_participants(self):
         return [participant for participant in self.participants]
 
-    def _match_factory_with(self, cfsm):
+    def _matcher_factory_with(self, cfsm):
         return MatcherFactory(self, cfsm)
 
     def interactions_that_define(self, variables):
