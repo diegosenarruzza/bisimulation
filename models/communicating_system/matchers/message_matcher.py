@@ -19,9 +19,7 @@ class MessageMatcher(Matcher):
             if len(message_candidates) == 0:
                 raise NoCandidateMatchException(f'There is no candidates for message: {interaction.message}')
 
-            self.decider.take(
-                Decision(self, interaction.message, message_candidates)
-            )
+            self.decide(interaction.message, message_candidates)
 
         return self.match_manager.get_match(interaction.message)
 
@@ -29,9 +27,9 @@ class MessageMatcher(Matcher):
         super().decide_match(matched, candidate)
         self.variable_matcher.decide_match(matched, candidate)
 
-    def rollback_match(self, matched, candidate):
-        super().rollback_match(matched, candidate)
-        self.variable_matcher.rollback_match(matched, candidate)
+    def rollback_match(self, matched, candidate, symmetric_mode_when_match):
+        super().rollback_match(matched, candidate, symmetric_mode_when_match)
+        self.variable_matcher.rollback_match(matched, candidate, symmetric_mode_when_match)
 
     def serialize(self):
         return merge_dicts(

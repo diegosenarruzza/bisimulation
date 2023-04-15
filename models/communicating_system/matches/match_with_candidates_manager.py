@@ -12,9 +12,13 @@ class MatchWithCandidatesManager(MatchManager):
         self.candidates.remove(matching, matched)
         super().match(matched, matching)
 
-    def unmatch(self, matched, matching):
-        self.candidates.add(matching, matched)
-        super().unmatch(matched, matching)
+    def unmatch(self, matched, matching, symmetric_mode_when_match):
+        if symmetric_mode_when_match == self.candidates.symmetric_mode:
+            self.candidates.add(matching, matched)
+        else:
+            self.candidates.add(matched, matching)
+
+        super().unmatch(matched, matching, symmetric_mode_when_match)
 
     def enable_symmetric_mode(self):
         super().enable_symmetric_mode()

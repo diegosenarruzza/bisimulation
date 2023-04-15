@@ -9,6 +9,7 @@ Message = Interaction.Message
 x = Int('x')
 number = Int('number')
 
+
 def _(state, *expressions):
     assertions = list(map(Assertion, expressions))
     return state, frozenset(assertions)
@@ -66,8 +67,15 @@ class CFSMTestCase(unittest.TestCase):
     def test_03_must_return_empty_relation_and_match_when_is_not_be_bisimilar_but_match(self):
         relation, matches = cfsm_example_3_1.calculate_bisimulation_with(cfsm_example_3_2)
 
-        self.assertEqual(set(), relation)
-        self.assertEqual({}, matches)
+        expected_relation = set()
+        expected_matches = {
+            'participants': {},
+            'messages': {},
+            'variables': {}
+        }
+
+        self.assertEqual(expected_relation, relation)
+        self.assertEqual(expected_matches, matches)
 
 
 if __name__ == '__main__':

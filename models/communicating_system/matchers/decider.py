@@ -10,7 +10,7 @@ class Decider:
         decision.decide()
         self.decisions.append(decision)
 
-    def take_next_decision(self):
+    def take_next_decision_with(self, match_manager):
         if self.there_are_decisions_to_take():
             last_decision = self.decisions.pop()
             # Hace rollback para "devolver" el candidato que saco cuando tomo la decision.
@@ -21,10 +21,13 @@ class Decider:
             #   - Le digo que vuelva a decidir, porque su lista de candidatos no es vacia, y tiene un elemento menos de la que uso para empezar (porque cuando decide, popea)
             #   - Vuelvo a pushear la decision, con la lista de candidatos mas corta
             if last_decision.has_more_candidates():
+                if last_decision.symmetric_mode_when_decide != match_manager.symmetric_mode:
+                    match_manager.swap_symmetric_mode()
+
                 self.take(last_decision)
             else:
                 # Si no tiene mas candidatos, la ultima decision ya no me sirve. Entonces sigo con la decision anterior.
-                self.take_next_decision()
+                self.take_next_decision_with(match_manager)
 
     def there_are_decisions_to_take(self):
         return len(self.decisions) > 0

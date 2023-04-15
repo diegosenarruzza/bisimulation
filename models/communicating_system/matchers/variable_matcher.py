@@ -16,9 +16,9 @@ class VariableMatcher(Matcher):
                 self.match_manager.match(matched_variable, candidate_variable)
 
     # Si "desmatcheo" un mensaje, las variables que habia en ese mensaje tiene que ser desmatcheadas tambien.
-    def rollback_match(self, matched_message, candidate_message):
+    def rollback_match(self, matched_message, candidate_message, symmetric_mode_when_match):
         for matched_variable, candidate_variable in zip(matched_message.payload, candidate_message.payload):
-            self.match_manager.unmatch(matched_variable, candidate_variable)
+            self.match_manager.unmatch(matched_variable, candidate_variable, symmetric_mode_when_match)
 
     def serialize(self):
         return {

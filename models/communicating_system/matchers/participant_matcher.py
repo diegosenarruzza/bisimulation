@@ -16,9 +16,8 @@ class ParticipantMatcher(Matcher):
         if not self.match_manager.has_matched(participant_id):
             if not self.match_manager.has_candidates():
                 raise NoCandidateMatchException(f'There is no candidates for participant: {participant_id}')
-            self.decider.take(
-                Decision(self, participant_id, self.match_manager.candidates_copy())
-            )
+
+            self.decide(participant_id, self.match_manager.candidates_copy())
 
         return self.match_manager.get_match(participant_id)
 

@@ -9,8 +9,11 @@ class MatchManager:
     def match(self, matched, matching):
         self.matches.add(matched, matching)
 
-    def unmatch(self, matched, matching):
-        self.matches.remove(matched, matching)
+    def unmatch(self, matched, matching, symmetric_mode_when_match):
+        if symmetric_mode_when_match == self.matches.symmetric_mode:
+            self.matches.remove(matched, matching)
+        else:
+            self.matches.remove(matching, matched)
 
     def has_matched(self, matched):
         return self.matches.includes(matched)
