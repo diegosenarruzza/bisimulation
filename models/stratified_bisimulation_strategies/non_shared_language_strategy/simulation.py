@@ -48,6 +48,8 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         return solver.check(Not(implication)) == unsat
 
     def _match_knowledge(self, knowledge):
+        self._match_interactions_that_define_non_matched_variables_in(knowledge)
+
         matched_knowledge = Knowledge(frozenset())
 
         for assertion in knowledge.assertions_set:
@@ -55,3 +57,15 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
                 self.bisimulation.matcher.match_assertion(assertion)
             )
         return matched_knowledge
+
+    def _match_interactions_that_define_non_matched_variables_in(self, knowledge):
+        non_matched_variables = set()
+
+        for assertion in knowledge.assertions_set:
+            for variable in assertion.get_variables():
+                if not self.bisimulation.matcher.message_matcher.variable_matcher.match_manager.has_matched(variable):
+                    non_matched_variables.add(variable)
+
+        transitions_for_non_matched_variables = self.simulated_state.graph.transitions_that_define(non_matched_variables)
+        for transition in transitions_for_non_matched_variables:
+            self.bisimulation.matcher.match(transition.label, transition.source)

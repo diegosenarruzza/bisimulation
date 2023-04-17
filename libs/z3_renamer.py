@@ -1,4 +1,4 @@
-from z3 import is_int_value, is_string_value, is_true, is_false, is_and, is_or, is_not, is_gt, is_ge, is_eq, is_lt, is_le, is_int, is_bool, is_string, And, Or, Not, Int, Bool, String
+from z3 import is_int_value, is_string_value, is_true, is_false, is_and, is_or, is_not, is_distinct, is_eq, is_gt, is_ge, is_lt, is_le, is_int, is_bool, is_string, And, Or, Not, Int, Bool, String
 
 
 def rename_variables(expression, renames):
@@ -21,6 +21,10 @@ def rename_variables(expression, renames):
     elif is_not(expression):
         sub_exp = expression.children()[0]
         return Not(rename_variables(sub_exp, renames))
+
+    elif is_distinct(expression):
+        left, right = rename_comparison(expression, renames)
+        return left != right
 
     elif is_eq(expression):
         left, right = rename_comparison(expression, renames)

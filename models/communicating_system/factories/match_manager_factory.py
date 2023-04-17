@@ -34,8 +34,8 @@ class MatchManagerFactory:
             self.message_match_manager = MessageMatchManager(
                 matches=self.empty_matches(),
                 candidates=SymmetricalList(
-                    self.cfsm_right.messages(),
-                    self.cfsm_left.messages(),
+                    list(self.cfsm_right.messages()),
+                    list(self.cfsm_left.messages()),
                     self.symmetry_mode
                 ),
                 participant_match_manager=self.participant_match()

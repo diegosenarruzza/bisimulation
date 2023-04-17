@@ -1,5 +1,5 @@
 from itertools import chain, combinations
-from z3 import BoolVal
+from z3 import BoolVal, is_var, is_app_of, is_app, Z3_OP_UNINTERPRETED
 
 TrueFormula = BoolVal(True)
 
@@ -11,16 +11,29 @@ def powerset(s):
     return list(map(frozenset, chain.from_iterable(combinations(s, r) for r in range(len(s)+1))))
 
 
-def collect_variables(assertion):
-    variables = set()
+# def collect_variables(assertion):
+#     variables = set()
+#
+#     if len(assertion.children()) > 0:
+#         for child in assertion.children():
+#             variables = variables.union(collect_variables(child))
+#     else:
+#         variables.add(assertion)
+#
+#     return variables
 
-    if len(assertion.children()) > 0:
-        for child in assertion.children():
-            variables = variables.union(collect_variables(child))
+def collect_variables(expression):
+    if is_var(expression):
+        return {expression}
+    elif is_app_of(expression, Z3_OP_UNINTERPRETED):
+        return {expression}
+    elif is_app(expression):
+        variables = set()
+        for arg in expression.children():
+            variables |= collect_variables(arg)
+        return variables
     else:
-        variables.add(assertion)
-
-    return variables
+        return set()
 
 
 # Devuelve un conjunto con las assertions cuyas variables no son las del "label".

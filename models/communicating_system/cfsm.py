@@ -33,7 +33,7 @@ class CommunicatingFiniteStateMachine(AFSM):
         return [transition.label for transition in self._all_transitions()]
 
     def messages(self):
-        return [transition.label.message for transition in self._all_transitions()]
+        return {transition.label.message for transition in self._all_transitions()}
 
     def get_participants(self):
         return [participant for participant in self.participants]
@@ -47,3 +47,8 @@ class CommunicatingFiniteStateMachine(AFSM):
             if interaction.contains_any(variables):
                 interactions.append(interaction)
         return interactions
+
+    def transitions_that_define(self, variables):
+        transitions = [transition for transition in self._all_transitions() if transition.label.contains_any(variables)]
+
+        return transitions
