@@ -1,6 +1,4 @@
-from libs.tools import merge_dicts
 from .matcher import Matcher
-from .decision import Decision
 from .no_candidate_match_exception import NoCandidateMatchException
 
 
@@ -17,7 +15,7 @@ class ParticipantMatcher(Matcher):
             if not self.match_manager.has_candidates():
                 raise NoCandidateMatchException(f'There is no candidates for participant: {participant_id}')
 
-            self.decide(participant_id, self.match_manager.candidates_copy())
+            self.take_decision(participant_id, self.match_manager.candidates_copy())
 
         return self.match_manager.get_match(participant_id)
 

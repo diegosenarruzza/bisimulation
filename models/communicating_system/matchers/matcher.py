@@ -3,26 +3,18 @@ from .decision import Decision
 
 class Matcher:
 
-    def __init__(self, decider, match_manager):
+    def __init__(self, decider, match_manager, symmetry_mode):
         self.decider = decider
         self.match_manager = match_manager
-        self.symmetric_mode = False
+        self.symmetry_mode = symmetry_mode
 
-    def decide_match(self, matched, candidate):
-        self.match_manager.match(matched, candidate)
-
-    def rollback_match(self, matched, candidate, symmetric_mode_when_match):
-        self.match_manager.unmatch(matched, candidate, symmetric_mode_when_match)
-
-    def enable_symmetric_mode(self):
-        self.symmetric_mode = True
-        self.match_manager.enable_symmetric_mode()
-
-    def disable_symmetric_mode(self):
-        self.symmetric_mode = False
-        self.match_manager.disable_symmetric_mode()
-
-    def decide(self, matched, candidates):
+    def take_decision(self, matched, candidates):
         self.decider.take(
-            Decision(self, matched, candidates, self.symmetric_mode)
+            Decision(self, matched, candidates, self.symmetry_mode.copy())
         )
+
+    def decide(self, decision):
+        self.match_manager.match(decision.matched, decision.current_candidate)
+
+    def rollback(self, decision):
+        self.match_manager.unmatch(decision.matched, decision.current_candidate)

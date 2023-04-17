@@ -1,24 +1,16 @@
 class Symmetrical:
 
-    def __init__(self, collection, symmetric_collection):
+    def __init__(self, collection, symmetric_collection, initial_symmetry_mode):
         self.collection = collection
         self.symmetric_collection = symmetric_collection
         self.symmetric_mode = False
+        self.symmetry_mode = initial_symmetry_mode
 
-    def enable_symmetric_mode(self):
-        self.symmetric_mode = True
+    def add(self, element, symmetric_element):
+        self.symmetry_mode.add_in(self, element, symmetric_element)
 
-    def disable_symmetric_mode(self):
-        self.symmetric_mode = False
+    def remove(self, element, symmetric_element):
+        self.symmetry_mode.remove_in(self, element, symmetric_element)
 
-    def _collections(self):
-        if self.symmetric_mode:
-            return self.symmetric_collection, self.collection
-        else:
-            return self.collection, self.symmetric_collection
-
-    def _current_collection(self):
-        if self.symmetric_mode:
-            return self.symmetric_collection
-        else:
-            return self.collection
+    def current_collection(self):
+        return self.symmetry_mode.current_collection_of(self)

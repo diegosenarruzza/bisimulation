@@ -1,25 +1,28 @@
 class Decision:
 
-    def __init__(self, matcher, matched, candidates, symmetric_mode_when_decide):
+    def __init__(self, matcher, matched, candidates, symmetry_mode_when_match):
         self.matcher = matcher
         self.matched = matched
         self.candidates = list(candidates)
         self.current_candidate = None
-        self.symmetric_mode_when_decide = symmetric_mode_when_decide
+        self.symmetry_mode_when_match = symmetry_mode_when_match
 
     def has_more_candidates(self):
         return len(self.candidates) > 0
 
     def decide(self):
         self.current_candidate = self.candidates.pop(0)
-        self.matcher.decide_match(self.matched, self.current_candidate)
+        self.matcher.decide(self)
 
     def rollback(self):
-        self.matcher.rollback_match(self.matched, self.current_candidate, self.symmetric_mode_when_decide)
+        self.matcher.rollback(self)
         self.current_candidate = None
 
 
 class NoDecision:
+
+    def __init__(self, initial_symmetry_mode):
+        self.symmetry_mode_when_match = initial_symmetry_mode
 
     def decide(self):
         return None

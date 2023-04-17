@@ -5,8 +5,8 @@ from ..shared_language_strategy.bisimulation import SharedLanguageBisimulationSt
 
 class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
 
-    def __init__(self, afsm_left, afsm_right, matcher):
-        super().__init__(afsm_left, afsm_right)
+    def __init__(self, cfsm_left, cfsm_right, matcher):
+        super().__init__(cfsm_left, cfsm_right)
         self.matcher = matcher
         self.initial_relation = None
 
@@ -44,9 +44,9 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
     def _enable_symmetric_mode_with(self, candidate_element):
         self.symmetric_mode = True
         self.current_simulation = NonSharedLanguageSimulationStrategy(self, tuple(reversed(candidate_element)))
-        self.matcher.enable_symmetric_mode()
+        self.matcher.symmetry_mode.enable()
 
     def _disable_symmetric_mode_with(self, candidate_element):
         self.symmetric_mode = False
         self.current_simulation = NonSharedLanguageSimulationStrategy(self, candidate_element)
-        self.matcher.disable_symmetric_mode()
+        self.matcher.symmetry_mode.disable()
