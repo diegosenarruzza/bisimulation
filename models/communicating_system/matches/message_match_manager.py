@@ -3,25 +3,22 @@ from .match_with_candidates_manager import MatchWithCandidatesManager
 
 class MessageMatchManager(MatchWithCandidatesManager):
 
-    def __init__(self, matches, candidates, interactions, participant_match_manager):
+    def __init__(self, matches, candidates, participant_match_manager):
         super().__init__(matches, candidates)
-        self.interactions = interactions
         self.participant_match_manager = participant_match_manager
 
-    def candidates_collections_for(self, interaction):
-        compatible_messages = [interaction.message for interaction in self._compatible_interactions_with(interaction)]
+    def candidates_collections_from(self, interaction, simulator_state):
+        compatible_messages = [interaction.message for interaction in self._compatible_interactions_with(interaction, simulator_state)]
         message_candidates = self._message_candidates_from(compatible_messages)
-        return compatible_messages, message_candidates
+        return message_candidates
 
-    def _compatible_interactions_with(self, interaction):
-        # return self.interactions.filter(lambda candidate_interaction: self._interactions_are_compatibles(interaction, candidate_interaction))
+    def _compatible_interactions_with(self, interaction, simulator_state):
         return [
-            candidate_interaction for candidate_interaction in self.interactions.current_collection()
-            if self._interactions_are_compatibles(interaction, candidate_interaction)
-
+            transition.label for transition in simulator_state.get_transitions()
+            if self._interactions_are_compatibles(interaction, transition.label)
         ]
 
-    # Son candidatos, para esta interaccion, los mensajes que estne en el conjunto de candidatos validos
+    # Son candidatos, para esta interaccion, los mensajes (candidatos) que esten en el conjunto de candidatos validos
     def _message_candidates_from(self, compatible_messages):
         return [candidate for candidate in self.candidates.current_collection() if candidate in compatible_messages]
 

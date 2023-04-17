@@ -17,7 +17,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         # Matcheo el label a simular y lo uso para:
         #   - Limpiar el knowledge simulador
         #   - Buscar las transiciones desde el estado simulador con el mismo label
-        matched_simulated_transition_label = self.bisimulation.matcher.match(self.simulated_transition.label)
+        matched_simulated_transition_label = self.bisimulation.matcher.match(self.simulated_transition.label, self.simulator_state)
 
         cleaned_simulator_knowledge = self.simulator_knowledge.clean_by(matched_simulated_transition_label)
         simulator_transitions = self.simulator_state.get_transitions_with(matched_simulated_transition_label)
@@ -37,9 +37,9 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         return valid_transitions_set_exists
 
     def _is_able_to_simulate_knowledge(self, simulator_assertion, cleaned_simulated_knowledge, cleaned_simulator_knowledge):
-        matched_cleaned_simulated_knowledge = self._match_knowledge(cleaned_simulator_knowledge.add(self.simulated_transition.assertion))
+        matched_cleaned_simulated_knowledge = self._match_knowledge(cleaned_simulated_knowledge.add(self.simulated_transition.assertion))
 
-        simulated_knowledge = matched_cleaned_simulated_knowledge.add(self.simulated_transition.assertion)
+        simulated_knowledge = matched_cleaned_simulated_knowledge.union(cleaned_simulator_knowledge)
         simulator_knowledge = cleaned_simulator_knowledge.add(simulator_assertion)
 
         implication = simulated_knowledge.build_implication_with(simulator_knowledge)
