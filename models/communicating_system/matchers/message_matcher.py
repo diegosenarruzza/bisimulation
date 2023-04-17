@@ -22,10 +22,6 @@ class MessageMatcher(Matcher):
 
         return self.match_manager.get_match(interaction.message)
 
-    def decide_match(self, matched, candidate):
-        super().decide_match(matched, candidate)
-        self.variable_matcher.decide_match(matched, candidate)
-
     def decide(self, decision):
         super().decide(decision)
         self.variable_matcher.decide(decision)

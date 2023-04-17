@@ -28,6 +28,7 @@ class MatchManagerFactory:
             )
         return self.participant_match_manager
 
+    # Message and interaction candidates to match with cfsm_left are cfsm_right messages and interactions
     def message_match(self):
         if self.message_match_manager is None:
             self.message_match_manager = MessageMatchManager(

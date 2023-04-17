@@ -3,11 +3,11 @@ class MatchManager:
     def __init__(self, matches):
         self.matches = matches
 
-    def match(self, matched, matching):
-        self.matches.add(matched, matching)
+    def match(self, matched, candidate):
+        self.matches.add(matched, candidate)
 
-    def unmatch(self, matched, matching):
-        self.matches.remove(matched, matching)
+    def unmatch(self, matched, candidate):
+        self.matches.remove(matched, candidate)
 
     def has_matched(self, matched):
         return self.matches.includes(matched)

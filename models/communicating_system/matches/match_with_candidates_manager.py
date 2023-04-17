@@ -7,13 +7,13 @@ class MatchWithCandidatesManager(MatchManager):
         self.candidates = candidates
         super().__init__(matches)
 
-    def match(self, matched, matching):
-        self.candidates.remove(matching, matched)
-        super().match(matched, matching)
+    def match(self, matched, candidate):
+        self.candidates.remove(candidate, matched)
+        super().match(matched, candidate)
 
-    def unmatch(self, matched, matching):
-        self.candidates.add(matching, matched)
-        super().unmatch(matched, matching)
+    def unmatch(self, matched, candidate):
+        self.candidates.add(candidate, matched)
+        super().unmatch(matched, candidate)
 
     def has_candidates(self):
         return self.candidates.is_empty()
