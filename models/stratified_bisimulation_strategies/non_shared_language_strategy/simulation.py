@@ -17,7 +17,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         # Matcheo el label a simular y lo uso para:
         #   - Limpiar el knowledge simulador
         #   - Buscar las transiciones desde el estado simulador con el mismo label
-        matched_simulated_transition_label = self.bisimulation.matcher.match(self.simulated_transition.label, self.simulator_state)
+        matched_simulated_transition_label = self.bisimulation.matcher.match(self.simulated_transition.label)
 
         cleaned_simulator_knowledge = self.simulator_knowledge.clean_by(matched_simulated_transition_label)
         simulator_transitions = self.simulator_state.get_transitions_with(matched_simulated_transition_label)
@@ -68,4 +68,4 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
 
         transitions_for_non_matched_variables = self.simulated_state.graph.transitions_that_define(non_matched_variables)
         for transition in transitions_for_non_matched_variables:
-            self.bisimulation.matcher.match(transition.label, transition.source)
+            self.bisimulation.matcher.match(transition.label)

@@ -1,13 +1,15 @@
 import unittest
-from z3 import Int
+from z3 import Int, BoolVal
 from ...resources.cfsm.example_1 import cfsm as cfsm_example_1
 from ...resources.cfsm.example_2 import cfsm_1 as cfsm_example_2_1, cfsm_2 as cfsm_example_2_2
 from ...resources.cfsm.example_3 import cfsm_1 as cfsm_example_3_1, cfsm_2 as cfsm_example_3_2
+from ...resources.cfsm.example_4 import cfsm_1 as cfsm_example_4_1, cfsm_2 as cfsm_example_4_2
 from models.communicating_system.interaction import Interaction
 from models.assertable_finite_state_machines.assertion import Assertion
 Message = Interaction.Message
 x = Int('x')
 number = Int('number')
+true = BoolVal(True)
 
 
 def _(state, *expressions):
@@ -65,7 +67,7 @@ class CFSMTestCase(unittest.TestCase):
         self.assertEqual(expected_matches, matches)
 
     def test_03_must_return_empty_relation_and_match_when_is_not_be_bisimilar_but_match(self):
-        relation, matches = cfsm_example_3_1.calculate_bisimulation_with(cfsm_example_3_2)
+        relation, matches = cfsm_example_3_2.calculate_bisimulation_with(cfsm_example_3_1)
 
         expected_relation = set()
         expected_matches = {
@@ -75,6 +77,47 @@ class CFSMTestCase(unittest.TestCase):
         }
 
         self.assertEqual(expected_relation, relation)
+        self.assertEqual(expected_matches, matches)
+
+    def test_04_must_match_and_be_bisimilar_when_split_a_transition_in_two(self):
+        p0 = cfsm_example_4_1.states['p0']
+        p1 = cfsm_example_4_1.states['p1']
+        p2 = cfsm_example_4_1.states['p2']
+        q0 = cfsm_example_4_2.states['q0']
+        q1 = cfsm_example_4_2.states['q1']
+        q2 = cfsm_example_4_2.states['q2']
+        q3 = cfsm_example_4_2.states['q3']
+
+        y = Int('y')
+        amount = Int('amount')
+        another_amount = Int('another_amount')
+
+        add_message = Message('add', payload=[x])
+        remove_message = Message('remove', payload=[y])
+        deposit_message = Message('deposit', payload=[amount])
+        withdraw_message = Message('withdraw', payload=[another_amount])
+
+        expected_relation = {
+            (_(p0), _(q0)),
+
+            (_(p1, x != 0), _(q1, amount > 0)),
+            (_(p2, x != 0, true), _(q3, amount > 0, true)),
+
+            (_(p1, x != 0), _(q2, amount < 0)),
+            (_(p2, x != 0, true), _(q3, amount < 0, true)),
+        }
+        expected_matches = {
+            'participants': {'consumer': 'client', 'adder': 'wallet', 'remover': 'bank'},
+            'messages': {
+                str(add_message): deposit_message,
+                str(remove_message): withdraw_message
+            },
+            'variables': {'x': amount, 'y': another_amount}
+        }
+
+        relation, matches = cfsm_example_4_1.calculate_bisimulation_with(cfsm_example_4_2, minimize=False)
+
+        self.assertIsSubset(expected_relation, relation)
         self.assertEqual(expected_matches, matches)
 
 

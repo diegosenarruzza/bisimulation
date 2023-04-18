@@ -38,6 +38,11 @@ class MatchManagerFactory:
                     list(self.cfsm_left.messages()),
                     self.symmetry_mode
                 ),
+                interactions=SymmetricalList(
+                    self.cfsm_right.interactions(),
+                    self.cfsm_left.interactions(),
+                    self.symmetry_mode
+                ),
                 participant_match_manager=self.participant_match()
             )
         return self.message_match_manager

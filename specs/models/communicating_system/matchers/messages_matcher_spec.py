@@ -2,7 +2,7 @@ import unittest
 from models.communicating_system.matchers.participant_matcher import ParticipantMatcher
 from models.communicating_system.matchers.message_matcher import MessageMatcher
 from models.communicating_system.matchers.decider import Decider
-from models.communicating_system.matchers.no_candidate_match_exception import NoCandidateMatchException
+from models.communicating_system.matchers.no_candidate_match_exception import NoCompatibleCandidateMatchException
 from models.communicating_system.interaction import Interaction
 from z3 import Int
 Message = Interaction.Message
@@ -104,7 +104,7 @@ class MessagesMatcherTestCase(unittest.TestCase):
 
         matcher.match(matchable_interaction)
 
-        with self.assertRaises(NoCandidateMatchException) as ctx:
+        with self.assertRaises(NoCompatibleCandidateMatchException) as ctx:
             matcher.match(non_matchable_interaction)
 
         self.assertEqual(
@@ -132,7 +132,7 @@ class MessagesMatcherTestCase(unittest.TestCase):
 
         matcher.match(matchable_interaction)
 
-        with self.assertRaises(NoCandidateMatchException) as ctx:
+        with self.assertRaises(NoCompatibleCandidateMatchException) as ctx:
             matcher.match(non_matchable_interaction)
 
         self.assertEqual(

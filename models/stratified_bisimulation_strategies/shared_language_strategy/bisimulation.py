@@ -1,5 +1,5 @@
 from .simulation import SharedLanguageSimulationStrategy
-from ..initial_relation_calculation import InitialRelationCalculation
+from ..initial_relation_builder import InitialRelationBuilder
 
 
 class SharedLanguageBisimulationStrategy:
@@ -51,7 +51,7 @@ class SharedLanguageBisimulationStrategy:
         self.current_relation = self._initial_relation()
 
     def _initial_relation(self):
-        return InitialRelationCalculation(self.afsm_left, self.afsm_right).calculate()
+        return InitialRelationBuilder(self.afsm_left, self.afsm_right).build()
 
     def _invalidate_current_relation(self):
         self.current_relation = []

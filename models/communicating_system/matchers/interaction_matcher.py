@@ -10,9 +10,9 @@ class InteractionMatcher:
         self.message_matcher = message_matcher
         self.symmetry_mode = symmetry_mode
 
-    def match(self, interaction, simulator_state):
-        sender, receiver = self.participant_matcher.match(interaction, simulator_state)
-        message = self.message_matcher.match(interaction, simulator_state)
+    def match(self, interaction):
+        sender, receiver = self.participant_matcher.match(interaction)
+        message = self.message_matcher.match(interaction)
 
         return Interaction(sender, receiver, message)
 

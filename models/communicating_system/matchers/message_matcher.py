@@ -9,8 +9,10 @@ class MessageMatcher(Matcher):
         super().__init__(decider, match_manager, symmetry_mode)
         self.variable_matcher = variable_matcher
 
-    def match(self, interaction, simulator_state):
-        message_candidates = self.match_manager.candidates_collections_from(interaction, simulator_state)
+    def match(self, interaction):
+        compatible_messages, message_candidates = self.match_manager.candidates_collections_for(interaction)
+        if len(compatible_messages) == 0:
+            raise NoCandidateMatchException(f'There is no compatible candidates for message: {interaction.message}')
 
         if not self.match_manager.has_matched(interaction.message):
             if len(message_candidates) == 0:
