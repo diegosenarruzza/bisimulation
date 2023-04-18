@@ -36,7 +36,7 @@ class Interaction:
             return len(self.payload) > 0
 
         def includes(self, variables):
-            return any(var in self.payload for var in variables)
+            return any(var in set(self.payload) for var in variables)
 
         def is_compatible_with(self, message):
             return self.payload_sort() == message.payload_sort()

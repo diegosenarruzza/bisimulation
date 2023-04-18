@@ -1,4 +1,4 @@
-from z3 import Int, Bool, String
+from z3 import Int, Bool, String, Real
 from models.communicating_system.interaction import Interaction
 
 
@@ -27,7 +27,9 @@ class InteractionParser:
 
         tag = message[0:open_payload_index]
         payload_string = message[open_payload_index+1:end_payload_index]
-        payload = [self._parse_variable(variable_string) for variable_string in payload_string.split(',')]
+        payload = []
+        if payload_string != '':
+            payload = [self._parse_variable(variable_string) for variable_string in payload_string.split(',')]
 
         return tag, payload
 
