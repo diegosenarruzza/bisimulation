@@ -1,8 +1,8 @@
 from libs.tools import merge_dicts
-from ..interaction import Interaction
+from ..action import Action
 
 
-class InteractionMatcher:
+class ActionMatcher:
 
     def __init__(self, decider, participant_matcher, message_matcher, symmetry_mode):
         self.decider = decider
@@ -10,11 +10,11 @@ class InteractionMatcher:
         self.message_matcher = message_matcher
         self.symmetry_mode = symmetry_mode
 
-    def match(self, interaction):
-        sender, receiver = self.participant_matcher.match(interaction)
-        message = self.message_matcher.match(interaction)
+    def match(self, action):
+        sender, receiver = self.participant_matcher.match(action)
+        message = self.message_matcher.match(action)
 
-        return Interaction(sender, receiver, message)
+        return Action(sender, receiver, message)
 
     def match_next(self):
         self.decider.take_next_decision()

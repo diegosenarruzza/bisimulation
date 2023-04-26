@@ -4,9 +4,9 @@ from .no_candidate_match_exception import NoCandidateMatchException
 
 class ParticipantMatcher(Matcher):
 
-    def match(self, interaction):
-        matched_sender = self.match_participant_with(interaction.sender)
-        matched_receiver = self.match_participant_with(interaction.receiver)
+    def match(self, action):
+        matched_sender = self.match_participant_with(action.sender)
+        matched_receiver = self.match_participant_with(action.receiver)
 
         return matched_sender, matched_receiver
 

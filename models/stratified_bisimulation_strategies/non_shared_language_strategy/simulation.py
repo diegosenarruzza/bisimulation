@@ -48,7 +48,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         return solver.check(Not(implication)) == unsat
 
     def _match_knowledge(self, knowledge):
-        self._match_interactions_that_define_non_matched_variables_in(knowledge)
+        self._match_actions_that_define_non_matched_variables_in(knowledge)
 
         matched_knowledge = Knowledge(frozenset())
 
@@ -58,7 +58,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
             )
         return matched_knowledge
 
-    def _match_interactions_that_define_non_matched_variables_in(self, knowledge):
+    def _match_actions_that_define_non_matched_variables_in(self, knowledge):
         non_matched_variables = set()
 
         for assertion in knowledge.assertions_set:

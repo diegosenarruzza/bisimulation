@@ -1,19 +1,19 @@
 from z3 import Int, Bool, String, Real
-from models.communicating_system.interaction import Interaction
+from models.communicating_system.action import Action
 
 
-class InteractionParser:
+class ActionParser:
 
-    def parse(self, interaction_string):
-        communication, message = self._split_interaction(interaction_string)
+    def parse(self, action_string):
+        communication, message = self._split_action(action_string)
         sender, receiver = self._parse_communication(communication)
         tag, payload = self._parse_message(message)
 
-        message = Interaction.Message(tag, payload)
-        return Interaction(sender, receiver, message)
+        message = Action.Message(tag, payload)
+        return Action(sender, receiver, message)
 
-    def _split_interaction(self, interaction_string):
-        participants, message = interaction_string.split(':')
+    def _split_action(self, action_string):
+        participants, message = action_string.split(':')
         return participants.strip(), message.strip()
 
     # Asumimos que los participants son representados SOLOS con un char. Ej:'wv!', 'pq?'

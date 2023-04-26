@@ -1,6 +1,6 @@
 from ..factories.match_manager_factory import MatchManagerFactory
 from ..matchers.decider import Decider
-from ..matchers.interaction_matcher import InteractionMatcher
+from ..matchers.action_matcher import ActionMatcher
 from ..matchers.participant_matcher import ParticipantMatcher
 from ..matchers.message_matcher import MessageMatcher
 from ..matchers.variable_matcher import VariableMatcher
@@ -16,8 +16,8 @@ class MatcherFactory:
         self.decider = Decider(self.symmetry_mode)
         self.match_manager_factory = MatchManagerFactory(cfsm_left, cfsm_right, self.symmetry_mode)
 
-    def interaction_matcher(self):
-        return InteractionMatcher(
+    def action_matcher(self):
+        return ActionMatcher(
             self.decider,
             self.participant_matcher(),
             self.message_matcher(),

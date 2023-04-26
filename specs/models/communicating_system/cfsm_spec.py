@@ -7,9 +7,9 @@ from ...resources.cfsm.example_4 import cfsm_1 as cfsm_example_4_1, cfsm_2 as cf
 from ...resources.cfsm.example_5 import cfsm_1 as cfsm_example_5_1, cfsm_2 as cfsm_example_5_2
 from ...resources.cfsm.example_6 import cfsm_1 as cfsm_example_6_1, cfsm_2 as cfsm_example_6_2
 from ...resources.cfsm.example_7 import cfsm_1 as cfsm_example_7_1, cfsm_2 as cfsm_example_7_2
-from models.communicating_system.interaction import Interaction
+from models.communicating_system.action import Action
 from models.assertable_finite_state_machines.assertion import Assertion
-Message = Interaction.Message
+Message = Action.Message
 x = Int('x')
 number = Int('number')
 true = BoolVal(True)

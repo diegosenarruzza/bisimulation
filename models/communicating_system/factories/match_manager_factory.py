@@ -28,7 +28,7 @@ class MatchManagerFactory:
             )
         return self.participant_match_manager
 
-    # Message and interaction candidates to match with cfsm_left are cfsm_right messages and interactions
+    # Message and action candidates to match with cfsm_left are cfsm_right messages and actions
     def message_match(self):
         if self.message_match_manager is None:
             self.message_match_manager = MessageMatchManager(
@@ -38,9 +38,9 @@ class MatchManagerFactory:
                     list(self.cfsm_left.messages()),
                     self.symmetry_mode
                 ),
-                interactions=SymmetricalList(
-                    self.cfsm_right.interactions(),
-                    self.cfsm_left.interactions(),
+                actions=SymmetricalList(
+                    self.cfsm_right.actions(),
+                    self.cfsm_left.actions(),
                     self.symmetry_mode
                 ),
                 participant_match_manager=self.participant_match()

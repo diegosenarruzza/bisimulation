@@ -9,18 +9,18 @@ class MessageMatcher(Matcher):
         super().__init__(decider, match_manager, symmetry_mode)
         self.variable_matcher = variable_matcher
 
-    def match(self, interaction):
-        compatible_messages, message_candidates = self.match_manager.candidates_collections_for(interaction)
+    def match(self, action):
+        compatible_messages, message_candidates = self.match_manager.candidates_collections_for(action)
         if len(compatible_messages) == 0:
-            raise NoCandidateMatchException(f'There is no compatible candidates for message: {interaction.message}')
+            raise NoCandidateMatchException(f'There is no compatible candidates for message: {action.message}')
 
-        if not self.match_manager.has_matched(interaction.message):
+        if not self.match_manager.has_matched(action.message):
             if len(message_candidates) == 0:
-                raise NoCandidateMatchException(f'There is no candidates for message: {interaction.message}')
+                raise NoCandidateMatchException(f'There is no candidates for message: {action.message}')
 
-            self.take_decision(interaction.message, message_candidates)
+            self.take_decision(action.message, message_candidates)
 
-        return self.match_manager.get_match(interaction.message)
+        return self.match_manager.get_match(action.message)
 
     def decide(self, decision):
         super().decide(decision)

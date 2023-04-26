@@ -1,4 +1,4 @@
-class Interaction:
+class Action:
 
     def __init__(self, sender, receiver, message):
         self.sender = sender
