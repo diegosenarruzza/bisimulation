@@ -35,7 +35,7 @@ class CFSMTestCase(unittest.TestCase):
             (_(q1, x > 0), _(q1, x > 0)),
         }
         expected_matches = {
-            'participants': {'customer': 'customer', 'service': 'service'},
+            'participants': {'Customer': 'Customer', 'Service': 'Service'},
             'messages': {str(f_x): f_x},
             'variables': {'x': x}
         }
@@ -59,7 +59,7 @@ class CFSMTestCase(unittest.TestCase):
             (_(p1, x > 0), _(q1, number > 0))
         }
         expected_matches = {
-            'participants': {'consumer': 'client', 'producer': 'shop'},
+            'participants': {'Consumer': 'Client', 'Producer': 'Shop'},
             'messages': {str(add_message): add_to_cart_message},
             'variables': {'x': number}
         }
@@ -110,7 +110,7 @@ class CFSMTestCase(unittest.TestCase):
             (_(p2, x != 0, true), _(q3, amount < 0, true)),
         }
         expected_matches = {
-            'participants': {'consumer': 'client', 'adder': 'wallet', 'remover': 'bank'},
+            'participants': {'Consumer': 'Client', 'Adder': 'Wallet', 'Remover': 'Bank'},
             'messages': {
                 str(add_message): deposit_message,
                 str(remove_message): withdraw_message
@@ -179,7 +179,7 @@ class CFSMTestCase(unittest.TestCase):
             (_(p0, true, user == 'user'), _(q0, true, username == 'user'))
         }
         expected_matches = {
-            'participants': {'client': 'client', 'service': 'db'},
+            'participants': {'Client': 'Client', 'Service': 'Db'},
             'messages': {
                 str(login_msg_user): login_msg_username,
                 str(success_msg): ok_msg,
