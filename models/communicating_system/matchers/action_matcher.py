@@ -11,10 +11,10 @@ class ActionMatcher:
         self.symmetry_mode = symmetry_mode
 
     def match(self, action):
-        sender, receiver = self.participant_matcher.match(action)
+        left_participant, right_participant = self.participant_matcher.match(action)
         message = self.message_matcher.match(action)
 
-        return Action(sender, receiver, message)
+        return Action(left_participant, right_participant, action.action, message)
 
     def match_next(self):
         self.decider.take_next_decision()

@@ -25,8 +25,9 @@ class MessageMatchManager(MatchWithCandidatesManager):
         return [candidate for candidate in self.candidates.current_collection() if candidate in compatible_messages]
 
     def _actions_are_compatibles(self, matchable_action, candidate_action):
-        sender = self.participant_match_manager.get_match(matchable_action.sender)
-        receiver = self.participant_match_manager.get_match(matchable_action.receiver)
-        return sender == candidate_action.sender and \
-            receiver == candidate_action.receiver and \
+        left_participant = self.participant_match_manager.get_match(matchable_action.left_participant)
+        right_participant = self.participant_match_manager.get_match(matchable_action.right_participant)
+        return left_participant == candidate_action.left_participant and \
+            right_participant == candidate_action.right_participant and \
+            matchable_action.action == candidate_action.action and \
             matchable_action.message.is_compatible_with(candidate_action.message)

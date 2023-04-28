@@ -5,10 +5,10 @@ from .no_candidate_match_exception import NoCandidateMatchException
 class ParticipantMatcher(Matcher):
 
     def match(self, action):
-        matched_sender = self.match_participant_with(action.sender)
-        matched_receiver = self.match_participant_with(action.receiver)
+        left_participant = self.match_participant_with(action.left_participant)
+        right_participant = self.match_participant_with(action.right_participant)
 
-        return matched_sender, matched_receiver
+        return left_participant, right_participant
 
     def match_participant_with(self, participant_id):
         if not self.match_manager.has_matched(participant_id):

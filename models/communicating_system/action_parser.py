@@ -2,8 +2,8 @@ from z3 import Int, Bool, String, Real
 from models.communicating_system.action import Action
 import re
 
-pattern = r'(?P<participant1>[A-Z][a-z]*)\s*'\
-          r'(?P<participant2>[A-Z][a-z]*)\s*'\
+pattern = r'(?P<participant1>[A-Z][a-z0-9]*)\s*'\
+          r'(?P<participant2>[A-Z][a-z0-9]*)\s*'\
           r'(?P<action>!|\?)\s*'\
           r'(?P<tag>\w+)\((?P<payload>.*)\)'
 
@@ -18,22 +18,11 @@ class ActionParser:
         else:
             raise Exception(f'Wrong action: {action_string}')
 
-        action = match['action']
-
-        if action == '!':
-            sender = match['participant1']
-            receiver = match['participant2']
-        elif action == '?':
-            sender = match['participant2']
-            receiver = match['participant1']
-        else:
-            raise Exception(f'Unknown action {action}')
-
         payload = self._parse_payload(match['payload'])
 
         message = Action.Message(match['tag'], payload)
 
-        return Action(sender, receiver, message)
+        return Action(match['participant1'], match['participant2'], match['action'], message)
 
     def _parse_payload(self, payload_string):
         if payload_string == '':
