@@ -11,7 +11,8 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         self.initial_relation = None
 
     def execute(self, minimize):
-        self._try_calculate_bisimulation_relation()
+        while not self.result_is_a_bisimulation() and self.matcher.has_more_possible_matches():
+            self._try_calculate_bisimulation_relation()
 
         if minimize:
             self._minimize_current_relation()
@@ -23,17 +24,12 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         self._set_initial_relation_as_current()
         try:
             self._calculate_bisimulation_from_current_relation()
-            if not self.result_is_a_bisimulation():
-                self._retry_if_is_possible()
         except MatchException:
-            self._retry_if_is_possible()
-
-    def _retry_if_is_possible(self):
-        self.matcher.match_next()
-        if self.matcher.has_more_possible_matches():
-            self._try_calculate_bisimulation_relation()
-        else:
             self._invalidate_current_relation()
+
+        if not self.result_is_a_bisimulation():
+            self._invalidate_current_relation()
+            self.matcher.match_next()
 
     def _initial_relation(self):
         if self.initial_relation is None:
