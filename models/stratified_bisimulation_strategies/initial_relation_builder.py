@@ -1,6 +1,14 @@
-from libs.tools import powerset
+from libs.tools import powerset, TrueFormula
 from itertools import product
 from models.assertable_finite_state_machines.assertion import Assertion
+from models.stratified_bisimulation_strategies.knowledge import Knowledge
+TrueAssertion = Assertion(TrueFormula)
+
+
+def knowledge_sets(s):
+    assertions = powerset(s)
+
+    return {Knowledge(assertions_set) for assertions_set in assertions}
 
 
 def _(state, *expressions):
@@ -21,9 +29,8 @@ class InitialRelationBuilder:
     # De todos estos puedo descartar directamente los que tengan assertions que no se contradigan (que si hago un AND, son directamente falsas)
 
     def build(self):
-
-        left_candidates = list(product(self.afsm_left.get_states(), powerset(self.afsm_left.all_assertions())))
-        right_candidates = list(product(self.afsm_right.get_states(), powerset(self.afsm_right.all_assertions())))
+        left_candidates = list(product(self.afsm_left.get_states(), knowledge_sets(self.afsm_left.all_assertions())))
+        right_candidates = list(product(self.afsm_right.get_states(), knowledge_sets(self.afsm_right.all_assertions())))
 
         candidates = list(product(left_candidates, right_candidates))
         return candidates

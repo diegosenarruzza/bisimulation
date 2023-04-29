@@ -1,5 +1,6 @@
 from .simulation import SharedLanguageSimulationStrategy
 from ..initial_relation_builder import InitialRelationBuilder
+from ..knowledge import Knowledge
 
 
 class SharedLanguageBisimulationStrategy:
@@ -44,8 +45,10 @@ class SharedLanguageBisimulationStrategy:
         if self.current_relation is None:
             return False
 
-        initial_element = ((self.afsm_left.initial_state, frozenset()), (self.afsm_right.initial_state, frozenset()))
-        return len(self.current_relation) > 0 and initial_element in self.current_relation
+        return len(self.current_relation) > 0 and self._initial_element() in self.current_relation
+
+    def _initial_element(self):
+        return (self.afsm_left.initial_state, Knowledge(frozenset())), (self.afsm_right.initial_state, Knowledge(frozenset()))
 
     def _set_initial_relation_as_current(self):
         self.current_relation = self._initial_relation()
@@ -64,6 +67,9 @@ class SharedLanguageBisimulationStrategy:
         while self.current_relation != next_relation:
             self.current_relation = next_relation
             next_relation = []
+
+            if not self.result_is_a_bisimulation():
+                self._invalidate_current_relation()
 
             for candidate_element in self.current_relation:
                 if self._is_a_bisimulation(candidate_element):

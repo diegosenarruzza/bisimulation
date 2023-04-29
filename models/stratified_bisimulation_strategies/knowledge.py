@@ -1,10 +1,13 @@
 from z3 import And, Implies
+from libs.tools import TrueFormula
+from models.assertable_finite_state_machines.assertion import Assertion
+TrueAssertion = Assertion(TrueFormula)
 
 
 class Knowledge:
 
     def __init__(self, assertions_set):
-        self.assertions_set = assertions_set
+        self.assertions_set = assertions_set - {TrueAssertion}
 
     def __repr__(self):
         return str(self.assertions_set)
