@@ -7,13 +7,9 @@ TrueAssertion = Assertion(TrueFormula)
 
 def knowledge_sets(s):
     assertions = powerset(s)
+    sets = {Knowledge(assertions_set) for assertions_set in assertions}
 
-    return {Knowledge(assertions_set) for assertions_set in assertions}
-
-
-def _(state, *expressions):
-    assertions = list(map(Assertion, expressions))
-    return state, frozenset(assertions)
+    return {knowledge for knowledge in sets if knowledge.is_satisfiable()}
 
 
 class InitialRelationBuilder:

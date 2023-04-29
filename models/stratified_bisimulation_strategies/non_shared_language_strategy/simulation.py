@@ -13,6 +13,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
 
     def _exists_a_valid_transition_subset_that_simulates(self):
         cleaned_simulated_knowledge = self.simulated_knowledge.clean_by(self.simulated_transition.label)
+        self.matched_cleaned_simulated_knowledge = self._match_knowledge(cleaned_simulated_knowledge.add(self.simulated_transition.assertion))
 
         # Matcheo el label a simular y lo uso para:
         #   - Limpiar el knowledge simulador
@@ -23,7 +24,6 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         simulator_transitions = self.simulator_state.get_transitions_with(matched_simulated_transition_label)
 
         simulator_transitions_subsets = list(powerset(simulator_transitions))
-        simulator_transitions_subsets.remove(frozenset())
 
         valid_transitions_set_exists = False
         j = 0
@@ -37,9 +37,7 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         return valid_transitions_set_exists
 
     def _is_able_to_simulate_knowledge(self, simulator_assertion, cleaned_simulated_knowledge, cleaned_simulator_knowledge):
-        matched_cleaned_simulated_knowledge = self._match_knowledge(cleaned_simulated_knowledge.add(self.simulated_transition.assertion))
-
-        simulated_knowledge = matched_cleaned_simulated_knowledge.union(cleaned_simulator_knowledge)
+        simulated_knowledge = self.matched_cleaned_simulated_knowledge.union(cleaned_simulator_knowledge)
         simulator_knowledge = cleaned_simulator_knowledge.add(simulator_assertion)
 
         implication = simulated_knowledge.build_implication_with(simulator_knowledge)
