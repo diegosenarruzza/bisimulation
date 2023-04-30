@@ -1,5 +1,6 @@
 from .match_exception import MatchException
 from .simulation import NonSharedLanguageSimulationStrategy
+from ..knowledge import Knowledge
 from ..shared_language_strategy.bisimulation import SharedLanguageBisimulationStrategy
 
 
@@ -46,3 +47,35 @@ class NonSharedLanguageBisimulationStrategy(SharedLanguageBisimulationStrategy):
         self.symmetric_mode = False
         self.current_simulation = NonSharedLanguageSimulationStrategy(self, candidate_element)
         self.matcher.symmetry_mode.disable()
+
+    def match(self):
+        action = self.current_simulation.simulated_transition.label
+        knowledge = self.current_simulation.simulated_knowledge.clean_by(action)
+
+        matched_knowledge = self._match_knowledge(knowledge.add(self.current_simulation.simulated_transition.assertion))
+        matched_action = self.matcher.match(action)
+
+        return matched_action, matched_knowledge
+
+    def _match_knowledge(self, knowledge):
+        self._match_actions_that_define_non_matched_variables_in(knowledge)
+
+        matched_knowledge = Knowledge(frozenset())
+
+        for assertion in knowledge.assertions_set:
+            matched_knowledge = matched_knowledge.add(
+                self.matcher.match_assertion(assertion)
+            )
+        return matched_knowledge
+
+    def _match_actions_that_define_non_matched_variables_in(self, knowledge):
+        non_matched_variables = set()
+
+        for assertion in knowledge.assertions_set:
+            for variable in assertion.get_variables():
+                if not self.matcher.message_matcher.variable_matcher.match_manager.has_matched(variable):
+                    non_matched_variables.add(variable)
+
+        transitions_for_non_matched_variables = self.current_simulation.simulated_state.graph.transitions_that_define(non_matched_variables)
+        for transition in transitions_for_non_matched_variables:
+            self.matcher.match(transition.label)
