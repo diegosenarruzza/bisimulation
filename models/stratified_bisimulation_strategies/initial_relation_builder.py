@@ -28,5 +28,5 @@ class InitialRelationBuilder:
         left_candidates = list(product(self.afsm_left.get_states(), knowledge_sets(self.afsm_left.all_assertions())))
         right_candidates = list(product(self.afsm_right.get_states(), knowledge_sets(self.afsm_right.all_assertions())))
 
-        candidates = list(product(left_candidates, right_candidates))
+        candidates = set(product(left_candidates, right_candidates))
         return candidates
