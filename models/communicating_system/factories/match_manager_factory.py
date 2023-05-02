@@ -26,6 +26,7 @@ class MatchManagerFactory:
                     self.symmetry_mode
                 )
             )
+            self.participant_match_manager.matches.add(self.cfsm_left.main_participant, self.cfsm_right.main_participant)
         return self.participant_match_manager
 
     # Message and action candidates to match with cfsm_left are cfsm_right messages and actions

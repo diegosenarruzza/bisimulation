@@ -1,5 +1,6 @@
 from .simulation import SharedLanguageSimulationStrategy
 from ..initial_relation_builder import InitialRelationBuilder
+from ..knowledge import Knowledge
 
 
 class SharedLanguageBisimulationStrategy:
@@ -25,27 +26,31 @@ class SharedLanguageBisimulationStrategy:
 
     def _minimize_current_relation(self):
         # Saco todos los elementos tq la relacion sigue siendo una bisimulacion
+        current_relation_as_list = list(self.current_relation)
         for i in range(0, len(self.current_relation)):
-            removed_element = self.current_relation.pop(0)
-            smallest_relation = self.current_relation
+            removed_element = current_relation_as_list.pop(0)
+
+            self.current_relation = set(current_relation_as_list)
 
             self._calculate_bisimulation_from_current_relation()
 
             # Si la nueva relacion no es una bisimulacion, entonces el elemento que saque era necesario
             if not self.result_is_a_bisimulation():
-                smallest_relation.append(removed_element)
+                current_relation_as_list.append(removed_element)
 
-            self.current_relation = smallest_relation
+        self.current_relation = set(current_relation_as_list)
 
     def result(self):
-        return set(self.current_relation)
+        return self.current_relation
 
     def result_is_a_bisimulation(self):
         if self.current_relation is None:
             return False
 
-        initial_element = ((self.afsm_left.initial_state, frozenset()), (self.afsm_right.initial_state, frozenset()))
-        return len(self.current_relation) > 0 and initial_element in self.current_relation
+        return len(self.current_relation) > 0 and self._initial_element() in self.current_relation
+
+    def _initial_element(self):
+        return (self.afsm_left.initial_state, Knowledge(frozenset())), (self.afsm_right.initial_state, Knowledge(frozenset()))
 
     def _set_initial_relation_as_current(self):
         self.current_relation = self._initial_relation()
@@ -54,20 +59,22 @@ class SharedLanguageBisimulationStrategy:
         return InitialRelationBuilder(self.afsm_left, self.afsm_right).build()
 
     def _invalidate_current_relation(self):
-        self.current_relation = []
+        self.current_relation = set()
 
     def _calculate_bisimulation_from_current_relation(self):
         # Detalle por el hecho de que tiene que ser un do-while
         next_relation = self.current_relation
-        self.current_relation = []
+        self.current_relation = set()
 
         while self.current_relation != next_relation:
             self.current_relation = next_relation
-            next_relation = []
+            next_relation = set()
 
+            if not self.result_is_a_bisimulation():
+                self._invalidate_current_relation()
             for candidate_element in self.current_relation:
                 if self._is_a_bisimulation(candidate_element):
-                    next_relation.append(candidate_element)
+                    next_relation.add(candidate_element)
 
     def _is_a_bisimulation(self, candidate_element):
         self._disable_symmetric_mode_with(candidate_element)

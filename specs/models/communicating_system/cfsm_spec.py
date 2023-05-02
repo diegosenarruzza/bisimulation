@@ -9,6 +9,7 @@ from ...resources.cfsm.example_6 import cfsm_1 as cfsm_example_6_1, cfsm_2 as cf
 from ...resources.cfsm.example_7 import cfsm_1 as cfsm_example_7_1, cfsm_2 as cfsm_example_7_2
 from models.communicating_system.action import Action
 from models.assertable_finite_state_machines.assertion import Assertion
+from models.stratified_bisimulation_strategies.knowledge import Knowledge
 Message = Action.Message
 x = Int('x')
 number = Int('number')
@@ -17,7 +18,7 @@ true = BoolVal(True)
 
 def _(state, *expressions):
     assertions = list(map(Assertion, expressions))
-    return state, frozenset(assertions)
+    return state, Knowledge(frozenset(assertions))
 
 
 class CFSMTestCase(unittest.TestCase):
@@ -74,7 +75,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = set()
         expected_matches = {
-            'participants': {},
+            'participants': {'Client': 'Consumer'},
             'messages': {},
             'variables': {}
         }
@@ -128,7 +129,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = set()
         expected_matches = {
-            'participants': {},
+            'participants': {'Client': 'Consumer'},
             'messages': {},
             'variables': {}
         }
@@ -141,7 +142,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = set()
         expected_matches = {
-            'participants': {},
+            'participants': {'Consumer': 'Consumer'},
             'messages': {},
             'variables': {}
         }
@@ -170,13 +171,13 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = {
             (_(p0), _(q0)),
-            (_(p1, true), _(q1, true)),
+            (_(p1), _(q1)),
 
-            (_(p2, true, user == 'root'), _(q2, true, username == 'root')),
-            (_(p0, true, user == 'root'), _(q0, true, username == 'root')),
+            (_(p2, user == 'root'), _(q2, username == 'root')),
+            (_(p0, user == 'root'), _(q0, username == 'root')),
 
-            (_(p2, true, user == 'user'), _(q3, true, username == 'user')),
-            (_(p0, true, user == 'user'), _(q0, true, username == 'user'))
+            (_(p2, user == 'user'), _(q3, username == 'user')),
+            (_(p0, user == 'user'), _(q0, username == 'user'))
         }
         expected_matches = {
             'participants': {'Client': 'Client', 'Service': 'Db'},

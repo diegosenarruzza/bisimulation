@@ -1,18 +1,17 @@
 from z3 import Or, Not, Solver, unsat
 from libs.tools import powerset
 from models.assertable_finite_state_machines.assertion import Assertion
-from ..knowledge import Knowledge
 
 
 class SharedLanguageSimulationStrategy:
 
     def __init__(self, bisimulation, candidate_element_tuple):
         self.bisimulation = bisimulation
-        (simulated_state, simulated_assertions_set), (simulator_state, simulator_assertions_set) = candidate_element_tuple
+        (simulated_state, simulated_knowledge), (simulator_state, simulator_knowledge) = candidate_element_tuple
         self.simulated_state = simulated_state
-        self.simulated_knowledge = Knowledge(simulated_assertions_set)
+        self.simulated_knowledge = simulated_knowledge
         self.simulator_state = simulator_state
-        self.simulator_knowledge = Knowledge(simulator_assertions_set)
+        self.simulator_knowledge = simulator_knowledge
 
         self.simulated_transition = None
 
@@ -71,10 +70,9 @@ class SharedLanguageSimulationStrategy:
         while not fall_into_current_relation and k < len(simulator_transitions_subset):
             simulator_transition = simulator_transitions_subset[k]
 
-            simulated_element = (self.simulated_transition.target, cleaned_simulated_knowledge.add(self.simulated_transition.assertion).assertions_set)
-            simulator_element = (simulator_transition.target, cleaned_simulator_knowledge.add(simulator_transition.assertion).assertions_set)
+            simulated_element = (self.simulated_transition.target, cleaned_simulated_knowledge.add(self.simulated_transition.assertion))
+            simulator_element = (simulator_transition.target, cleaned_simulator_knowledge.add(simulator_transition.assertion))
 
-            # fall_into_current_relation = self.bisimulation.includes((simulated_element, simulator_element))
             fall_into_current_relation = self.bisimulation.includes((simulated_element, simulator_element))
 
             k += 1

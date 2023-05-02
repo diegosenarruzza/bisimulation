@@ -7,6 +7,12 @@ class Decision:
         self.current_candidate = None
         self.symmetry_mode_when_match = symmetry_mode_when_match
 
+    def __repr__(self):
+        return str(self)
+
+    def __str__(self):
+        return f'{self.matched}: {self.current_candidate} or {str(self.candidates)}'
+
     def has_more_candidates(self):
         return len(self.candidates) > 0
 
@@ -32,3 +38,9 @@ class NoDecision:
 
     def has_more_candidates(self):
         return False
+
+    def __str__(self):
+        return 'NoDecision'
+
+    def __repr__(self):
+        return 'NoDecision'

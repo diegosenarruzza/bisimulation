@@ -1,7 +1,6 @@
 from z3 import Solver, Not, unsat
 from libs.tools import powerset
 from ..shared_language_strategy.simulation import SharedLanguageSimulationStrategy
-from ..knowledge import Knowledge
 
 # Para ver si se cumple la condicion de simulacion del conocimiento, necesito matchear todos los componentes que simulan.
 #   - El label de la simulated transition
@@ -14,16 +13,12 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
     def _exists_a_valid_transition_subset_that_simulates(self):
         cleaned_simulated_knowledge = self.simulated_knowledge.clean_by(self.simulated_transition.label)
 
-        # Matcheo el label a simular y lo uso para:
-        #   - Limpiar el knowledge simulador
-        #   - Buscar las transiciones desde el estado simulador con el mismo label
-        matched_simulated_transition_label = self.bisimulation.matcher.match(self.simulated_transition.label)
+        matched_simulated_action, self.matched_cleaned_simulated_knowledge = self.bisimulation.match()
 
-        cleaned_simulator_knowledge = self.simulator_knowledge.clean_by(matched_simulated_transition_label)
-        simulator_transitions = self.simulator_state.get_transitions_with(matched_simulated_transition_label)
+        cleaned_simulator_knowledge = self.simulator_knowledge.clean_by(matched_simulated_action)
+        simulator_transitions = self.simulator_state.get_transitions_with(matched_simulated_action)
 
         simulator_transitions_subsets = list(powerset(simulator_transitions))
-        simulator_transitions_subsets.remove(frozenset())
 
         valid_transitions_set_exists = False
         j = 0
@@ -37,35 +32,10 @@ class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):
         return valid_transitions_set_exists
 
     def _is_able_to_simulate_knowledge(self, simulator_assertion, cleaned_simulated_knowledge, cleaned_simulator_knowledge):
-        matched_cleaned_simulated_knowledge = self._match_knowledge(cleaned_simulated_knowledge.add(self.simulated_transition.assertion))
-
-        simulated_knowledge = matched_cleaned_simulated_knowledge.union(cleaned_simulator_knowledge)
+        simulated_knowledge = self.matched_cleaned_simulated_knowledge.union(cleaned_simulator_knowledge)
         simulator_knowledge = cleaned_simulator_knowledge.add(simulator_assertion)
 
         implication = simulated_knowledge.build_implication_with(simulator_knowledge)
         solver = Solver()
 
         return solver.check(Not(implication)) == unsat
-
-    def _match_knowledge(self, knowledge):
-        self._match_actions_that_define_non_matched_variables_in(knowledge)
-
-        matched_knowledge = Knowledge(frozenset())
-
-        for assertion in knowledge.assertions_set:
-            matched_knowledge = matched_knowledge.add(
-                self.bisimulation.matcher.match_assertion(assertion)
-            )
-        return matched_knowledge
-
-    def _match_actions_that_define_non_matched_variables_in(self, knowledge):
-        non_matched_variables = set()
-
-        for assertion in knowledge.assertions_set:
-            for variable in assertion.get_variables():
-                if not self.bisimulation.matcher.message_matcher.variable_matcher.match_manager.has_matched(variable):
-                    non_matched_variables.add(variable)
-
-        transitions_for_non_matched_variables = self.simulated_state.graph.transitions_that_define(non_matched_variables)
-        for transition in transitions_for_non_matched_variables:
-            self.bisimulation.matcher.match(transition.label)
