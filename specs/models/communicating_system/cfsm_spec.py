@@ -75,7 +75,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = set()
         expected_matches = {
-            'participants': {},
+            'participants': {'Client': 'Consumer'},
             'messages': {},
             'variables': {}
         }
@@ -129,7 +129,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = set()
         expected_matches = {
-            'participants': {},
+            'participants': {'Client': 'Consumer'},
             'messages': {},
             'variables': {}
         }
@@ -142,7 +142,7 @@ class CFSMTestCase(unittest.TestCase):
 
         expected_relation = set()
         expected_matches = {
-            'participants': {},
+            'participants': {'Consumer': 'Consumer'},
             'messages': {},
             'variables': {}
         }

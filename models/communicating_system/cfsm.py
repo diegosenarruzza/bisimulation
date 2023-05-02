@@ -9,7 +9,7 @@ class CommunicatingFiniteStateMachine(AFSM):
 
     def __init__(self, participants):
         # TODO: Verify are not repeated
-        self.participants = participants
+        self.main_participant, *self.participants = participants
         super().__init__()
 
     def __repr__(self):
