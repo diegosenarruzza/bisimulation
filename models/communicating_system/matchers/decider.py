@@ -33,3 +33,13 @@ class Decider:
 
     def there_are_decisions_to_take(self):
         return len(self.decisions) > 0
+
+    def __str__(self):
+        return str(self.decisions)
+
+    def __repr__(self):
+        string = '[ \n'
+        for decision in self.decisions:
+            string += f'  {decision}\n'
+        string += ']'
+        return string
