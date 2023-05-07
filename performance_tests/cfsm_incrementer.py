@@ -1,5 +1,5 @@
 import random
-from z3 import Int
+from z3 import Int, String, And, Bool, BoolVal
 from models.communicating_system.cfsm import CommunicatingFiniteStateMachine as CFSM
 
 
@@ -49,19 +49,32 @@ class CFSMIncrementer:
             participant = random.choice(rest_of_participants)
 
             payload_arity = random.randint(1, 3) # entre 1 y 3 parametros
-            payload = [f'{random.choice(self.types)} x{index}.{i}' for i in range(payload_arity)]
+            constraints = []
+            payload = []
+            for i in range(payload_arity):
+                var_type = random.choice(self.types)
+                var = f'x{index}.{i}'
+                payload.append(f'{var_type} {var}')
+                if type == 'int':
+                    constraint = Int(var) != 0
+                    constraints.append(constraint)
+                elif type == 'string':
+                    constraint = String(var) != ''
+                    constraints.append(constraint)
+
+            assertion = BoolVal(True) if len(constraints) == 0 else And(constraints)
             message = f"f{index}({','.join(payload)})"
 
             action = f'{main_participant}{participant}! {message}'
-            new_cfsm.add_transition_between(source_state_id, target_state_id, action)
+            new_cfsm.add_transition_between(source_state_id, target_state_id, action, assertion)
             index += 1
 
         return new_cfsm, index
 
-    def increment_splitting_transitions_in_new_states(self, cfsm: CFSM, size: int, index: int) -> (CFSM, int):
+    def increment_splitting_transitions(self, cfsm: CFSM, size: int, index: int) -> (CFSM, int):
         new_cfsm = self.copy(cfsm)
-        main_participant = new_cfsm.participants[0]
-        rest_of_participants = new_cfsm.participants[1:]
+        main_participant = new_cfsm.main_participant
+        rest_of_participants = new_cfsm.participants
 
         current_state_ids = list(new_cfsm.states.keys())
 
@@ -85,8 +98,8 @@ class CFSMIncrementer:
 
     def increment_splitting_transitions_in_new_states(self, cfsm: CFSM, size: int, index: int) -> (CFSM, int):
         new_cfsm = self.copy(cfsm)
-        main_participant = new_cfsm.participants[0]
-        rest_of_participants = new_cfsm.participants[1:]
+        main_participant = new_cfsm.main_participant
+        rest_of_participants = new_cfsm.participants
 
         current_state_ids = list(new_cfsm.states.keys())
 
@@ -94,7 +107,6 @@ class CFSMIncrementer:
             source_state_id = random.choice(current_state_ids)
             target_state_id_1 = f'q{len(new_cfsm.states) + i}[1]'
             target_state_id_2 = f'q{len(new_cfsm.states) + i}[2]'
-
             participant = random.choice(rest_of_participants)
 
             payload_arity = random.randint(1, 3) # entre 1 y 3 parametros
