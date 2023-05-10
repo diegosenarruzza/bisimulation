@@ -45,7 +45,7 @@ class CFSMIncrementer:
 
         for i in range(size):
             source_state_id = random.choice(current_state_ids)
-            target_state_id = f'q{len(new_cfsm.states) + i}'
+            target_state_id = f'q{len(new_cfsm.states)}'
             participant = random.choice(rest_of_participants)
 
             payload_arity = random.randint(1, 3) # entre 1 y 3 parametros
@@ -80,7 +80,7 @@ class CFSMIncrementer:
 
         for i in range(int(size/2)):
             source_state_id = random.choice(current_state_ids)
-            target_state_id = f'q{len(new_cfsm.states) + i}'
+            target_state_id = f'q{len(new_cfsm.states)}'
             participant = random.choice(rest_of_participants)
 
             payload_arity = random.randint(1, 3) # entre 1 y 3 parametros
@@ -105,8 +105,8 @@ class CFSMIncrementer:
 
         for i in range(int(size/2)):
             source_state_id = random.choice(current_state_ids)
-            target_state_id_1 = f'q{len(new_cfsm.states) + i}[1]'
-            target_state_id_2 = f'q{len(new_cfsm.states) + i}[2]'
+            target_state_id_1 = f'q{len(new_cfsm.states)}[1]'
+            target_state_id_2 = f'q{len(new_cfsm.states)}[2]'
             participant = random.choice(rest_of_participants)
 
             payload_arity = random.randint(1, 3) # entre 1 y 3 parametros

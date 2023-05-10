@@ -20,7 +20,7 @@ class CFSMIncrementerAnalyzer:
         self.incrementer = CFSMIncrementer()
 
     def calculate_bisimulation_with_simple_increment_strategy(self):
-        writer = self.CSVWriter(f'{self.path}/increment_strategy.csv')
+        writer = self.CSVWriter(f'{self.path}/simple_increment.csv')
         writer.create()
         metrics = self.calculate_bisimulation_for_with_strategy(self.incrementer.increment, writer)
         return metrics
