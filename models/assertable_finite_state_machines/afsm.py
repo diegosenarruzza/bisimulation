@@ -50,11 +50,11 @@ class AFSM:
         return set(
             map(
                 lambda transition: transition.assertion,
-                self._all_transitions()
+                self.all_transitions()
             )
         )
 
-    def _all_transitions(self):
+    def all_transitions(self):
         return [transition for transitions in self.transitions_by_source_id.values() for transition in transitions]
 
     def get_states(self):
@@ -70,6 +70,6 @@ class AFSM:
         return SharedLanguageBisimulationStrategy(self, afsm)
 
     def transitions_that_define(self, variables):
-        transitions = [transition for transition in self._all_transitions() if transition.label.contains_any(variables)]
+        transitions = [transition for transition in self.all_transitions() if transition.label.contains_any(variables)]
 
         return transitions

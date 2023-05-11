@@ -56,10 +56,10 @@ class CommunicatingFiniteStateMachine(AFSM):
         )
 
     def actions(self):
-        return [transition.label for transition in self._all_transitions()]
+        return [transition.label for transition in self.all_transitions()]
 
     def messages(self):
-        return {transition.label.message for transition in self._all_transitions()}
+        return {transition.label.message for transition in self.all_transitions()}
 
     def get_participants(self):
         return [participant for participant in self.participants]

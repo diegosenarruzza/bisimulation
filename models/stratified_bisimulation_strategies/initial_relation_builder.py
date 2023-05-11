@@ -3,13 +3,6 @@ from itertools import product
 from models.stratified_bisimulation_strategies.knowledge import Knowledge
 
 
-def knowledge_sets(s):
-    assertions = powerset(s)
-    sets = {Knowledge(assertions_set) for assertions_set in assertions}
-
-    return {knowledge for knowledge in sets if knowledge.is_satisfiable()}
-
-
 def dfs(start, end, visited, path):
     visited.add(start)
     path.append(start)
@@ -27,36 +20,49 @@ def dfs(start, end, visited, path):
 class InitialRelationBuilder:
 
     def __init__(self, afsm_left, afsm_right):
-        self.afsm_left = afsm_left
-        self.afsm_right = afsm_right
+        self.left_candidates_builder = self.CandidatesBuilder(afsm_left)
+        self.right_candidates_builder = self.CandidatesBuilder(afsm_right)
 
     def build(self):
-        # First approach could be do: states x PowerSet(assertions) as candidates for each automata
-        # This approach filters the states of each assertion, leaving those that are reachable from the states that define the variables of that assertion.
-        left_candidates = self._calculate_candidates_for(self.afsm_left)
-        right_candidates = self._calculate_candidates_for(self.afsm_right)
+        # First approach could be do: states x PowerSet(assertions) as candidates for each automaton
+        # This approach filter the reachable states from the state which makes available an assertion (the target of the corresponding transition)
+        left_candidates = self.left_candidates_builder.build()
+        right_candidates = self.right_candidates_builder.build()
 
         candidates = set(product(left_candidates, right_candidates))
         return candidates
 
-    def _calculate_candidates_for(self, afsm):
-        assertions = afsm.all_assertions()
-        owner_variable_states_by_assertion = {}
-        for assertion in assertions:
-            if len(assertion.get_variables()) > 0:
-                owner_variable_states_by_assertion[assertion] = {transition.target for transition in afsm.transitions_that_define(assertion.get_variables())}
+    class CandidatesBuilder:
 
-        assertions_by_state = {}
-        for end_state in afsm.get_states():
-            assertions_by_state[end_state.id] = set()
-            for assertion, start_states in owner_variable_states_by_assertion.items():
-                # If there is a path between any state p and a state owner of a variable, any assertion with that variable could finalize in a knowledge of p.
-                if any(dfs(start_state, end_state, set(), []) is not None for start_state in start_states):
-                    assertions_by_state[end_state.id].add(assertion)
+        def __init__(self, afsm):
+            self.afsm = afsm
 
-        candidates = []
-        for state_id, assertions_set in assertions_by_state.items():
-            state = afsm.states[state_id]
-            candidates += [(state, knowledge) for knowledge in knowledge_sets(assertions_set)]
-        #
-        return candidates
+        def build(self):
+            assertions_by_state = self._build_reachable_assertions_by_state()
+
+            candidates = []
+            for state, assertions_set in assertions_by_state.items():
+                candidates += [(state, knowledge) for knowledge in self.knowledge_set_for(assertions_set)]
+
+            return candidates
+
+        def _build_reachable_assertions_by_state(self):
+            assertions_by_state = {}
+            for state in self.afsm.get_states():
+                assertions_by_state[state] = set()
+
+            for transition in self.afsm.all_transitions():
+                for state in self._reachable_states_from(transition.target):
+                    assertions_by_state[state].add(transition.assertion)
+
+            return assertions_by_state
+
+        def _reachable_states_from(self, start_state):
+            # An end_state is reachable from start_state if there is a path between start_state and it.
+            return {end_state for end_state in self.afsm.get_states() if dfs(start_state, end_state, set(), []) is not None}
+
+        def knowledge_set_for(self, assertions_set):
+            assertions_sets = powerset(assertions_set)
+            knowledge_set = {Knowledge(assertions_set) for assertions_set in assertions_sets}
+
+            return {knowledge for knowledge in knowledge_set if knowledge.is_satisfiable()}
