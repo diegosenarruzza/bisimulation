@@ -68,3 +68,8 @@ class AFSM:
 
     def _bisimulation_strategy_with(self, afsm):
         return SharedLanguageBisimulationStrategy(self, afsm)
+
+    def transitions_that_define(self, variables):
+        transitions = [transition for transition in self._all_transitions() if transition.label.contains_any(variables)]
+
+        return transitions

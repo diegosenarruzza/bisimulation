@@ -40,7 +40,7 @@ class CommunicatingFiniteStateMachine(AFSM):
             self.add_state(target_id)
 
         action = self._parse_action(action_string)
-        # validate action participants are in participant_ids
+        # validate action participants are ine participant_ids
 
         super().add_transition_between(source_id, target_id, action, formula)
 
@@ -66,15 +66,3 @@ class CommunicatingFiniteStateMachine(AFSM):
 
     def _matcher_factory_with(self, cfsm):
         return MatcherFactory(self, cfsm)
-
-    def actions_that_define(self, variables):
-        actions = []
-        for action in self.actions():
-            if action.contains_any(variables):
-                actions.append(action)
-        return actions
-
-    def transitions_that_define(self, variables):
-        transitions = [transition for transition in self._all_transitions() if transition.label.contains_any(variables)]
-
-        return transitions
