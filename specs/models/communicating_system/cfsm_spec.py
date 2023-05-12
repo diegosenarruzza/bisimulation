@@ -7,6 +7,7 @@ from ...resources.cfsm.example_4 import cfsm_1 as cfsm_example_4_1, cfsm_2 as cf
 from ...resources.cfsm.example_5 import cfsm_1 as cfsm_example_5_1, cfsm_2 as cfsm_example_5_2
 from ...resources.cfsm.example_6 import cfsm_1 as cfsm_example_6_1, cfsm_2 as cfsm_example_6_2
 from ...resources.cfsm.example_7 import cfsm_1 as cfsm_example_7_1, cfsm_2 as cfsm_example_7_2
+from ...resources.cfsm.example_8 import cfsm as cfsm_example_8
 from models.communicating_system.action import Action
 from models.assertable_finite_state_machines.assertion import Assertion
 from models.stratified_bisimulation_strategies.knowledge import Knowledge
@@ -191,6 +192,44 @@ class CFSMTestCase(unittest.TestCase):
 
         relation, matches = cfsm_example_7_1.calculate_bisimulation_with(cfsm_example_7_2, minimize=False)
 
+        self.assertIsSubset(expected_relation, relation)
+        self.assertEqual(expected_matches, matches)
+
+    def test_08(self):
+        q0 = cfsm_example_8.states['q0']
+        q1 = cfsm_example_8.states['q1']
+        q2 = cfsm_example_8.states['q2']
+        q3 = cfsm_example_8.states['q3']
+        q4 = cfsm_example_8.states['q4']
+        y = Int('y')
+        f_x = Message('f', [x])
+        g_y = Message('g', [y])
+        m1 = Message('m1')
+        m2 = Message('m2')
+
+        expected_relation = {
+            (_(q0), _(q0)),
+            (_(q1), _(q1)),
+            (_(q1, y > 0, x > 0), _(q1, y > 0, x > 0)),
+            (_(q2, y > 0, x > 0), _(q2, y > 0, x > 0)),
+            (_(q3, y <= 0), _(q3, y <= 0)),
+            (_(q3, y <= 0, x > 0), _(q3, y <= 0, x > 0)),
+            (_(q4, y <= 0), _(q4, y <= 0)),
+            (_(q4, y <= 0, x > 0), _(q4, y <= 0, x > 0)),
+        }
+
+        expected_matches = {
+            'participants': {'A1': 'A1', 'A2': 'A2'},
+            'messages': {
+                str(f_x): f_x,
+                str(g_y): g_y,
+                str(m1): m1,
+                str(m2): m2
+            },
+            'variables': {'x': x, 'y': y}
+        }
+
+        relation, matches = cfsm_example_8.calculate_bisimulation_with(cfsm_example_8)
         self.assertIsSubset(expected_relation, relation)
         self.assertEqual(expected_matches, matches)
 
