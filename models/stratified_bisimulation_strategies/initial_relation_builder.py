@@ -1,11 +1,12 @@
 from libs.tools import powerset
 from itertools import product
 from models.stratified_bisimulation_strategies.knowledge import Knowledge
-from models.assertable_finite_state_machines.assertion import Assertion
-from z3 import is_and, And
 
 
-def dfs(start, end, visited, path):
+def dfs(start, end, visited=None, path=[]):
+    if visited is None:
+        visited = set()
+
     visited.add(start)
     path.append(start)
     if start == end:
@@ -38,6 +39,7 @@ class InitialRelationBuilder:
 
         def __init__(self, afsm):
             self.afsm = afsm
+            self.reachable_states_cache = {}
 
         def build(self):
             assertions_by_state = self._build_reachable_assertions_by_state()
@@ -54,45 +56,35 @@ class InitialRelationBuilder:
                 assertions_by_state[state] = set()
 
             for transition in self.afsm.all_transitions():
-                reachable_states = self._reachable_states_from(transition.target)
-                for state in reachable_states:
+                for state in self._reachable_states_from(transition.target):
                     assertions_by_state[state].add(transition.assertion)
 
-            for transition in self.afsm.all_transitions():
-                available_assertions_until_source = assertions_by_state[transition.source] - {transition.assertion}
-                available_and_assertions_until_source = {assertion for assertion in available_assertions_until_source if is_and(assertion.expression)}
-
-                for assertion in available_and_assertions_until_source:
-                    if transition.label.contains_any(assertion.get_variables()):
-                        non_redefined_assertion = self.cleaned_and_assertion(assertion, transition)
-
-                        for state in self._reachable_states_from(transition.target):
-                            if non_redefined_assertion is not None and non_redefined_assertion != assertion:
-                                assertions_by_state[state].add(non_redefined_assertion)
+            # There is a problem with And assertions, at moment to check if and cleaned And assertion exists in current relation,
+            # this will be false, cause cleaned assertion was never calculated and was never incorporated in initial relation.
+            # ej:   label: f(int x), knowledge: And(x > 0, y > 0), cleaned_assertion: y > 0, state: q
+            #       initial_relation = (q, And(x > 0, y > 0)), and it wil check if (q, y > 0) \in initial_relation.
+            # This method extends knowledge when an And assertion is reachable for a transition that redefine a variable (and so clean it)
+            # to all reachable states from the one that redefine the assertion.
+            self._fill_reachable_states_with_cleaned_assertions(assertions_by_state)
 
             return assertions_by_state
 
-        def cleaned_and_assertion(self, assertion, transition):
-            non_redefined_sub_expressions = []
-            # Me quedo con las sub expresiones de esta assertion, que no sean redefinidas en esta transicion
-            for sub_expression in assertion.expression.children():
-                sub_assertion = Assertion(sub_expression)
-                if not transition.label.contains_any(sub_assertion.get_variables()):
-                    non_redefined_sub_expressions.append(sub_expression)
+        def _fill_reachable_states_with_cleaned_assertions(self, assertions_by_state):
+            for transition in self.afsm.all_transitions():
+                available_assertions_until_source = assertions_by_state[transition.source] - {transition.assertion}
 
-            # Si quedan expresiones a usar como parte del conocimiento, las agrego
-            non_redefined_assertion = None
-            if len(non_redefined_sub_expressions) > 0:
-                if len(non_redefined_sub_expressions) == 1:
-                    non_redefined_assertion = Assertion(non_redefined_sub_expressions[0])
-                else:
-                    non_redefined_assertion = Assertion(And(non_redefined_sub_expressions))
+                for assertion in available_assertions_until_source:
+                    cleaned_assertion = assertion.clean_by(transition.label)
+                    if cleaned_assertion is not None and assertion != cleaned_assertion:
+                        for state in self._reachable_states_from(transition.target):
+                            assertions_by_state[state].add(cleaned_assertion)
 
-            return non_redefined_assertion
-
+        # An end_state is reachable from start_state if there is a path between start_state and it.
         def _reachable_states_from(self, start_state):
-            # An end_state is reachable from start_state if there is a path between start_state and it.
-            return {end_state for end_state in self.afsm.get_states() if dfs(start_state, end_state, set(), []) is not None}
+            if start_state not in self.reachable_states_cache:
+                self.reachable_states_cache[start_state] = {end_state for end_state in self.afsm.get_states() if dfs(start_state, end_state) is not None}
+
+            return self.reachable_states_cache[start_state]
 
         def knowledge_set_for(self, assertions_set):
             assertions_sets = powerset(assertions_set)

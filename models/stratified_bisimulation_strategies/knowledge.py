@@ -19,27 +19,13 @@ class Knowledge:
         return self.assertions_set.__hash__()
 
     def clean_by(self, label):
-        new_assertions_set = set()
+        cleaned_assertions_set = set()
         for assertion in self.assertions_set:
+            cleaned_assertion = assertion.clean_by(label)
+            if cleaned_assertion is not None:
+                cleaned_assertions_set.add(cleaned_assertion)
 
-            if is_and(assertion.expression):
-                non_redefined_sub_expressions = []
-                # Me quedo con las sub expresiones de esta assertion, que no sean redefinidas en esta transicion
-                for sub_expression in assertion.expression.children():
-                    sub_assertion = Assertion(sub_expression)
-                    if not label.contains_any(sub_assertion.get_variables()):
-                        non_redefined_sub_expressions.append(sub_expression)
-
-                # Si quedan expresiones a usar como parte del conocimiento, las agrego
-                if len(non_redefined_sub_expressions) > 0:
-                    for non_redefined_sub_expression in non_redefined_sub_expressions:
-                        new_assertions_set.add(Assertion(non_redefined_sub_expression))
-            else:
-                if not label.contains_any(assertion.get_variables()):
-                    new_assertions_set.add(assertion)
-
-        # new_assertions_set = frozenset([assertion for assertion in self.assertions_set if not label.contains_any(assertion.get_variables())])
-        return Knowledge(frozenset(new_assertions_set))
+        return Knowledge(frozenset(cleaned_assertions_set))
 
     def union(self, other_knowledge):
         return Knowledge(self.assertions_set.union(other_knowledge.assertions_set))
