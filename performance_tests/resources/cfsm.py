@@ -6,9 +6,9 @@ cfsm = CFSM(['P1', 'P2', 'P3'])
 cfsm.set_as_initial('q0')
 
 cfsm.add_transition_between('q0', 'q1', 'P1P2! f1(int x1)')
-cfsm.add_transition_between('q0', 'q2', 'P1P2? f2(bool x2)')
+cfsm.add_transition_between('q0', 'q2', 'P2P1? f2(bool x2)')
 cfsm.add_transition_between('q1', 'q3', 'P1P2! f1(int x1)')
-cfsm.add_transition_between('q2', 'q3', 'P1P2? f2(bool x2)')
+cfsm.add_transition_between('q2', 'q3', 'P2P1? f2(bool x2)')
 
 x3_1 = Int('x3.1')
 x3_2 = Int('x3.2')
