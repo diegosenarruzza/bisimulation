@@ -1,0 +1,22 @@
+[project]
+name = "CFSM-Bisimulation"
+version = "0.0.1"
+authors = [
+  { name="Diego Senarruzza", email="diegosenarruzza@gmail.com" },
+]
+description = "A bisiumlation data-aware algorithm for Communicating Finite State Machines with edge assertions (knowledge as a-CFSM)"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3"
+]
+license = {file = "LICENSE.txt"}
+keywords = ["bisimulation", "cfsm", "automaton"]
+
+[project.urls]
+"Homepage" = "https://github.com/diegosenarruzza/bisimulation"
+"Bug Reports" = "https://github.com/diegosenarruzza/bisimulation/issues"
+"Source" = "https://github.com/diegosenarruzza/bisimulation"
