@@ -1,4 +1,4 @@
-# bisimulation
+# Communicating Finite State Machines Bisimulation with edge assertions
 
 
 ## Installation
