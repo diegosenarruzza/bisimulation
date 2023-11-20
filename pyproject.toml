@@ -20,3 +20,6 @@ keywords = ["bisimulation", "cfsm", "automaton"]
 "Homepage" = "https://github.com/diegosenarruzza/bisimulation"
 "Bug Reports" = "https://github.com/diegosenarruzza/bisimulation/issues"
 "Source" = "https://github.com/diegosenarruzza/bisimulation"
+
+[build-system]
+requires = ["setuptools", "z3", "z3-solver"]

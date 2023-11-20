@@ -2,10 +2,10 @@ from z3 import Solver, Not, unsat
 from ....libs.tools import powerset
 from ..shared_language_strategy.simulation import SharedLanguageSimulationStrategy
 
-# Para ver si se cumple la condicion de simulacion del conocimiento, necesito matchear todos los componentes que simulan.
-#   - El label de la simulated transition
-#   - La assertion de la simulated transition
-#   - El simulated knowledge
+# To see if knowledge simulation condition is satisfied, I need to match every component that simulate:
+#   - The simulated transition label
+#   - The simulated transition assertion
+#   - The simulated knowledge
 
 
 class NonSharedLanguageSimulationStrategy(SharedLanguageSimulationStrategy):

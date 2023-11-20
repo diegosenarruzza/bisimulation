@@ -1,6 +1,6 @@
 from z3 import Or, Not, Solver, unsat
 from ....libs.tools import powerset
-from src.cfsm_bisimulation.models.assertable_finite_state_machines.assertion import Assertion
+from ....models.assertable_finite_state_machines.assertion import Assertion
 
 
 class SharedLanguageSimulationStrategy:

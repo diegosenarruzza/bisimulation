@@ -1,5 +1,5 @@
 from ....libs.z3_renamer import rename_variables
-from src.cfsm_bisimulation.models.assertable_finite_state_machines.assertion import Assertion
+from ....models.assertable_finite_state_machines.assertion import Assertion
 from .matcher import Matcher
 
 

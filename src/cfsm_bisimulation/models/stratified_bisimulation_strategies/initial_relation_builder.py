@@ -1,6 +1,6 @@
 from ...libs.tools import powerset
 from itertools import product
-from src.cfsm_bisimulation.models.stratified_bisimulation_strategies.knowledge import Knowledge
+from ...models.stratified_bisimulation_strategies.knowledge import Knowledge
 
 
 def dfs(start, end, visited=None, path=[]):
@@ -27,8 +27,9 @@ class InitialRelationBuilder:
         self.right_candidates_builder = self.CandidatesBuilder(afsm_right)
 
     def build(self):
-        # First approach could be do: states x PowerSet(assertions) as candidates for each automaton
-        # This approach filter the reachable states from the state which makes available an assertion (the target of the corresponding transition)
+        # First approach could be: states x PowerSet(assertions) as candidates for each automaton
+        # This approach filter the reachable states from the state which makes available an assertion
+        # (the target of the corresponding transition)
         left_candidates = self.left_candidates_builder.build()
         right_candidates = self.right_candidates_builder.build()
 
@@ -59,11 +60,14 @@ class InitialRelationBuilder:
                 for state in self._reachable_states_from(transition.target):
                     assertions_by_state[state].add(transition.assertion)
 
-            # There is a problem with And assertions, at moment to check if and cleaned And assertion exists in current relation,
-            # this will be false, cause cleaned assertion was never calculated and was never incorporated in initial relation.
+            # There is a problem with And assertions, at moment to check if and cleaned And assertion
+            # exists in current relation,
+            # this will be false, cause cleaned assertion was never calculated and was never incorporated
+            # in initial relation.
             # ej:   label: f(int x), knowledge: And(x > 0, y > 0), cleaned_assertion: y > 0, state: q
             #       initial_relation = (q, And(x > 0, y > 0)), and it wil check if (q, y > 0) \in initial_relation.
-            # This method extends knowledge when an And assertion is reachable for a transition that redefine a variable (and so clean it)
+            # This method extends knowledge when an And assertion is reachable for a transition that redefine a variable
+            # (and so clean it).
             # to all reachable states from the one that redefine the assertion.
             self._fill_reachable_states_with_cleaned_assertions(assertions_by_state)
 
@@ -82,7 +86,9 @@ class InitialRelationBuilder:
         # An end_state is reachable from start_state if there is a path between start_state and it.
         def _reachable_states_from(self, start_state):
             if start_state not in self.reachable_states_cache:
-                self.reachable_states_cache[start_state] = {end_state for end_state in self.afsm.get_states() if dfs(start_state, end_state) is not None}
+                self.reachable_states_cache[start_state] = {
+                    end_state for end_state in self.afsm.get_states() if dfs(start_state, end_state) is not None
+                }
 
             return self.reachable_states_cache[start_state]
 
