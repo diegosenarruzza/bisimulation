@@ -9,7 +9,7 @@ You can read about this CFSM extension in *"Design-by-Contract for Flexible Mult
 This library provides both, a model for creating a-CFSMs and an algorithm for evaluating bisimulation. The main idea behind the algorithm is based on the fact that two automata do not have to coincide in the names of their participants, messages or variables used. Therefore, the algorithm constructs a matching of names as it builds the bisimulation relationship between the evaluated automata (if this is not possible, the automata are not bisimilar). 
 For example, the following two automata would be bisimilar:
 
-<img src="automaton.png">
+<img src="https://github.com/diegosenarruzza/bisimulation/raw/master/automaton.png">
 
 ## Installation
 
