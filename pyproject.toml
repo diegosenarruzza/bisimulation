@@ -22,4 +22,4 @@ keywords = ["bisimulation", "cfsm", "automaton"]
 "Source" = "https://github.com/diegosenarruzza/bisimulation"
 
 [build-system]
-requires = ["setuptools", "z3", "z3-solver"]
+requires = ["setuptools", "z3-solver"]

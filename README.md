@@ -16,7 +16,7 @@ For example, the following two automata would be bisimilar:
 At first, you will need to install `z3` and `z3-solver` as dependencies. You can use pip:
 
 ```bash
-pip install z3 z3-solver cfsm-bisimulation
+pip install z3-solver cfsm-bisimulation
 ```
 
 ## Usage
