@@ -1,6 +1,6 @@
 [project]
 name = "cfsm-bisimulation"
-version = "0.0.1"
+version = "1.0.0"
 authors = [
   { name="Diego Senarruzza", email="diegosenarruzza@gmail.com" },
 ]

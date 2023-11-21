@@ -1,14 +1,15 @@
 # Communicating Finite State Machines Bisimulation with edge assertions
 
 An algorithm to decide if two Communicating Finite State Machines (CFSM) with edge assertions,
-know as _Asserted Communicating Finite State Machines_ (a-CFSM) are bisimilars.
+known as _Asserted Communicating Finite State Machines_ (a-CFSM) are bisimilars.
 You can read about this CFSM extension in *"Design-by-Contract for Flexible Multiparty Session Protocols"* Section 4.3 (by *Lorenzo Gheri*, *Ivan Lanese*, *Neil Sayers*, *Emilio Tuosto*, and *Nobuko Yoshida*). 
 
 
 ### What does this package do?
-This library provides both a model for creating a-CFSMs and an algorithm for evaluating bisimulation. The main idea behind the algorithm is based on the fact that two automata do not have to coincide in the names of their participants, messages or variables used. Therefore, the algorithm constructs a matching of names as it builds the bisimulation relationship between the evaluated automata (if this is not possible, the automata are not bisimilar). 
+This library provides both, a model for creating a-CFSMs and an algorithm for evaluating bisimulation. The main idea behind the algorithm is based on the fact that two automata do not have to coincide in the names of their participants, messages or variables used. Therefore, the algorithm constructs a matching of names as it builds the bisimulation relationship between the evaluated automata (if this is not possible, the automata are not bisimilar). 
 For example, the following two automata would be bisimilar:
 
+<img src="automaton.png">
 
 ## Installation
 
